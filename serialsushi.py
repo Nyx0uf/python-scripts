@@ -12,7 +12,7 @@ from sys import platform as _platform
 
 MY_SUSHI_PATH = str("")
 if _platform == "linux" or _platform == "linux2":
-    MY_SUSHI_PATH = "/home/nyxouf/scripts/Sushi/sushi.py"
+    MY_SUSHI_PATH = "~/Sushi/sushi.py"
 elif _platform == "darwin":
     MY_SUSHI_PATH = "/Users/nyxouf/Documents/scripts/Sushi/sushi.py"
 else:
