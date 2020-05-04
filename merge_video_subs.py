@@ -13,15 +13,16 @@ import argparse
 from pathlib import Path
 from shlex import quote
 from typing import List
-from utils import common, av
+from utils import av, common
 
 def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str):
     """Merge `subs` into `vids` and output a .mkv file, assuming `subs` and `vids` are the exact same length"""
+    flag_forced = "forced" in name.lower()
     for idx, _ in enumerate(subs):
         sub = subs[idx]
         vid = vids[idx]
         str_vid = str(vid)
-        mkvmerge = f'mkvmerge -o {quote(str_vid + ".mkv")} {quote(str_vid)} --language 0:{lang} --track-name 0:{name} {quote(str(sub))}'
+        mkvmerge = f'mkvmerge -o {quote(str_vid + ".mkv")} {quote(str_vid)} --language 0:{lang} --track-name 0:{quote(name)} --forced-track 0:{flag_forced} {quote(str(sub))}'
         os.system(mkvmerge)
 
 if __name__ == "__main__":

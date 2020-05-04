@@ -21,7 +21,7 @@ def merge_subs(audios: List[Path], vids: List[Path], lang: str, name: str):
         audio = audios[idx]
         vid = vids[idx]
         str_vid = str(vid)
-        mkvmerge = f'mkvmerge -o {quote(str_vid + ".mkv")} {quote(str_vid)} --language 0:{lang} --track-name 0:{name} {quote(str(audio))}'
+        mkvmerge = f'mkvmerge -o {quote(str_vid + ".mkv")} {quote(str_vid)} --language 0:{lang} --track-name 0:{quote(name)} {quote(str(audio))}'
         os.system(mkvmerge)
 
 if __name__ == "__main__":
