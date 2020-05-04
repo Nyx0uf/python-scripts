@@ -13,7 +13,7 @@ import datetime
 import csv
 from threading import Thread, Lock
 from typing import Dict, List
-import extract_msg
+import extract_msg # pip install extract_msg
 from utils import common
 
 DAY_HOUR_MAP: Dict[str, str] = {
