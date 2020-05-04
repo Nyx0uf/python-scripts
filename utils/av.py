@@ -31,6 +31,7 @@ VIDEO_EXTENSIONS: List[str] = [
     str('.265'),
     str('.avi'),
     str('.mkv'),
+    str('.mov'),
     str('.mp4'),
     str('.mpg'),
     str('.mpeg'),
