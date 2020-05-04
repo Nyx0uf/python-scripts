@@ -7,7 +7,6 @@ Commonly used functions
 
 import os
 import sys
-import platform
 import subprocess
 import multiprocessing
 import time
@@ -24,13 +23,13 @@ COLOR_WHITE = '\033[0m'
 COLOR_YELLOW = '\033[93m'
 
 def str2bool(value: str) -> bool:
-    """Convert `value` to a boolean"""
+    """Convert `value` to a bool"""
     lpv = value.lower()
     if lpv in ('yes', 'true', 't', 'y', '1'):
         return True
     if lpv in ('no', 'false', 'f', 'n', '0'):
         return False
-    raise "Error"
+    raise f"<{value}> can't be converted to a bool"
 
 def list_directory(path: Path, filt=None, sort=False) -> List[Path]:
     """Returns the list of files at `path`"""
@@ -92,16 +91,14 @@ def which(program: str) -> str:
     return None
 
 def as_queue(lst) -> Queue:
-    """queue as list"""
+    """returns `lst` as a Queue"""
     q = Queue()
     for x in lst:
         q.put(x)
     return q
 
 def parallel(fct, args: tuple) -> float:
-    """
-    Execute `fct` with `args` in parallel
-    """
+    """Execute `fct` with `args` in parallel"""
     t_start = time.time()
     queue = args[0]
     for i in range(multiprocessing.cpu_count()):
@@ -116,10 +113,6 @@ def abort(msg: str = None):
     if msg is not None:
         print(msg)
     sys.exit(-1)
-
-def is_windows() -> bool:
-    """Return true if running on Windows"""
-    return "windows" in platform.system().lower()
 
 def system_call(command: str) -> str:
     """Execute `command` and returns stdout"""
