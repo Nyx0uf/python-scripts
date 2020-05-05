@@ -64,7 +64,7 @@ if __name__ == "__main__":
             continue
 
         if track.type == "video":
-            commands[track] = f"{track.id}:{quote(args.src)}.{track.id}.vid{track.file_extension}"
+            commands[track] = f"{track.id}:{quote(str(mkv.path))}.{track.id}.vid{track.file_extension}"
         else:
             if track.is_commentary():
                 print(f"[+] Track {track.id}: Commentary, skipping...")
@@ -75,13 +75,13 @@ if __name__ == "__main__":
 
             if track.type == "audio":
                 if track.lang in audio_langs:
-                    commands[track] = f"{track.id}:{quote(args.src)}.{track.id}.{track.lang}{track.file_extension}"
+                    commands[track] = f"{track.id}:{quote(str(mkv.path))}.{track.id}.{track.lang}{track.file_extension}"
             elif track.type == "subtitles":
                 if track.lang in subtitles_langs and track.codec in subtitles_types:
                     force = ""
                     if track.forced is True:
                         force = "-forced"
-                    commands[track] = f"{track.id}:{quote(args.src)}.{track.id}.{track.lang}{force}{track.file_extension}"
+                    commands[track] = f"{track.id}:{quote(str(mkv.path))}.{track.id}.{track.lang}{force}{track.file_extension}"
 
     # Find best quality audio track
     for lang in audio_langs:
