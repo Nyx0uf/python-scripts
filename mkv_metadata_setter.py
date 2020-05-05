@@ -39,23 +39,22 @@ if __name__ == "__main__":
         name = f.stem.replace(args.repl, "")
         cmd = f'mkvpropedit {quote(str(f))}'
         if args.video_name is not None:
-            cmd += f' --edit track:v1 --set language={args.video_lang} --set flag-default=1 --set "name={args.video_name}"'
+            cmd += f' --edit track:v1 --set language={args.video_lang} --set flag-default=1 --set name={quote(args.video_name)}'
         if args.audio_name is not None:
-            audio_names = args.audio_name.replace(" ", "").split(",")
-            audio_langs = args.audio_lang.replace(" ", "").split(",")
+            audio_names = args.audio_name.split(",")
+            audio_langs = args.audio_lang.split(",")
             tid = 1
             for an in audio_names:
-                cmd += f' --edit track:a{tid} --set language={audio_langs[tid - 1]} --set flag-default=0 --set "name={an}"'
+                cmd += f' --edit track:a{tid} --set language={audio_langs[tid - 1]} --set flag-default=0 --set name={quote(an)}'
                 tid += 1
         if args.sub_name is not None:
-            sub_names = args.sub_name.replace(" ", "").split(",")
-            sub_langs = args.sub_lang.replace(" ", "").split(",")
+            sub_names = args.sub_name.split(",")
+            sub_langs = args.sub_lang.split(",")
             tid = 1
             for sn in sub_names:
                 forced = "forced" in sn.lower()
-                cmd += f' --edit track:s{tid} --set language={sub_langs[tid - 1]} --set flag-default=0 --set "name={sn}"'
-                if forced is True:
-                    cmd += f' --set flag-forced=1'
+                cmd += f' --edit track:s{tid} --set language={sub_langs[tid - 1]} --set flag-default=0 --set name={quote(sn)}'
+                cmd += f' --set flag-forced=1' if forced is True else f' --set flag-forced=0'
                 tid += 1
-        cmd += f' --edit info --set "title={name}"'
+        cmd += f' --edit info --set title={quote(name)}'
         os.system(cmd)
