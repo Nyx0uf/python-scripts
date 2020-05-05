@@ -8,17 +8,12 @@ Remove files from plex library after 30 days
 import time
 import argparse
 from pathlib import Path
-from typing import List
 from utils import common
-
-MOVIES_TO_REMOVE: List[Path] = [
-    Path("Ibiza (2019).mkv"),
-]
-TIME_TO_KEEP = float(31 * 86400)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to movies directory")
+    parser.add_argument("-t", action="store", dest="t", type=float, default=2678400, help="Time to keep in seconds (default = 1 month)")
     args = parser.parse_args()
 
     # Sanity checks
@@ -26,14 +21,12 @@ if __name__ == "__main__":
         common.abort(parser.format_help())
 
     # Get a list of files
-    path = args.src.resolve()
-    target = [path / x for x in MOVIES_TO_REMOVE]
-    files = common.list_directory(path, lambda x: x in target)
+    files = common.list_directory(args.src.resolve())
 
     now = time.time()
     for f in files:
         creation_time = f.stat().st_ctime
-        limit = creation_time + TIME_TO_KEEP
+        limit = creation_time + args.t
         if limit < now:
             print(f"[+] Removing <{f}>")
             f.unlink()
