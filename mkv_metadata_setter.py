@@ -11,23 +11,25 @@ import os
 import argparse
 from pathlib import Path
 from shlex import quote
+from typing import List
 from utils import common
+from utils import mkvfile
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or video file")
+    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single mkv file")
     parser.add_argument("-vn", action="store", dest="video_name", type=str, default=None, help="Name of the video track")
-    parser.add_argument("-an", action="store", dest="audio_name", type=str, default=None, help="Name of the audio track")
-    parser.add_argument("-sn", action="store", dest="sub_name", type=str, default=None, help="Name of the subtitle track")
+    parser.add_argument("-an", action="store", dest="audio_name", type=str, default=None, help="Name of the audio tracks, comma separated")
+    parser.add_argument("-sn", action="store", dest="sub_name", type=str, default=None, help="Name of the subtitles tracks, comma separated")
     parser.add_argument("-vl", action="store", dest="video_lang", type=str, default="und", help="Lang of the video track")
-    parser.add_argument("-al", action="store", dest="audio_lang", type=str, default="jpn", help="Lang of the audio track")
-    parser.add_argument("-sl", action="store", dest="sub_lang", type=str, default="eng", help="Lang of the subtitle track")
+    parser.add_argument("-al", action="store", dest="audio_lang", type=str, default="jpn", help="Lang of the audio tracks, comma separated")
+    parser.add_argument("-sl", action="store", dest="sub_lang", type=str, default="eng", help="Lang of the subtitles tracks, comma separated")
     parser.add_argument("-repl", action="store", dest="repl", type=str, default="", help="Pattern to replace for the Title")
     args = parser.parse_args()
 
     # Sanity checks
-    if common.which("mkvpropedit") is None:
-        common.abort("[!] mkvtoolnix not found in $PATH")
+    if common.which("mkvpropedit") is None or common.which("mediainfo") is None:
+        common.abort("[!] mkvtoolnix / mediainfo not found in $PATH")
 
     if args.src.exists() is False:
         common.abort(parser.format_help())
@@ -36,25 +38,51 @@ if __name__ == "__main__":
     files = common.list_directory(args.src.resolve(), lambda x: x.suffix == ".mkv", True)
 
     for f in files:
-        name = f.stem.replace(args.repl, "")
+        mkv = mkvfile.MkvFile(f)
         cmd = f'mkvpropedit {quote(str(f))}'
-        if args.video_name is not None:
-            cmd += f' --edit track:v1 --set language={args.video_lang} --set flag-default=1 --set name={quote(args.video_name)}'
-        if args.audio_name is not None:
-            audio_names = args.audio_name.split(",")
-            audio_langs = args.audio_lang.split(",")
-            tid = 1
-            for an in audio_names:
-                cmd += f' --edit track:a{tid} --set language={audio_langs[tid - 1]} --set flag-default=0 --set name={quote(an)}'
-                tid += 1
-        if args.sub_name is not None:
-            sub_names = args.sub_name.split(",")
-            sub_langs = args.sub_lang.split(",")
-            tid = 1
-            for sn in sub_names:
-                forced = "forced" in sn.lower()
-                cmd += f' --edit track:s{tid} --set language={sub_langs[tid - 1]} --set flag-default=0 --set name={quote(sn)}'
-                cmd += f' --set flag-forced=1' if forced is True else f' --set flag-forced=0'
-                tid += 1
-        cmd += f' --edit info --set title={quote(name)}'
+        # Handle video track
+        vtrack: mkvfile.MkvTrack = list(filter(lambda x: x.type == "video", mkv.tracks))[0]
+        vn = f'{args.video_lang.upper()} — {mkv.video_codec_desc()} — {args.video_name if args.video_name is not None else vtrack.codec}'
+        cmd += f' --edit track:v1 --set language={args.video_lang} --set name={quote(vn)}'
+        # Handle audio tracks
+        atracks: List[mkvfile.MkvTrack] = list(filter(lambda x: x.type == "audio", mkv.tracks))
+        audio_langs = args.audio_lang.split(",")
+        audio_names = args.audio_name.split(",") if args.audio_name else []
+        tid = 1
+        for track in atracks:
+            if tid <= len(audio_langs):
+                al = audio_langs[tid - 1]
+            else:
+                al = "und"
+            if track.audio_channels in [1, 2]:
+                channels = f'{track.audio_channels}.0'
+            else:
+                channels = f'{track.audio_channels - 1}.1'
+            an = f'{al.upper()} — {track.codec.upper()} {channels}'
+            if track.audio_bits is not None:
+                an += f' / {track.audio_bits}bits'
+            if tid <= len(audio_names):
+                an += f' — {audio_names[tid - 1]}'
+            cmd += f' --edit track:a{tid} --set language={al} --set name={quote(an)}'
+            tid += 1
+        # Handle subtitles tracks
+        stracks = list(filter(lambda x: x.type == "subtitles", mkv.tracks))
+        sub_langs = args.sub_lang.split(",")
+        sub_names = args.sub_name.split(",") if args.sub_name else []
+        tid = 1
+        for track in stracks:
+            if tid <= len(sub_langs):
+                sl = sub_langs[tid - 1]
+            else:
+                sl = "und"
+            sn = f'{sl.upper()}'
+            forced = False
+            if tid <= len(sub_names):
+                s = sub_names[tid - 1]
+                forced = "forced" in s.lower()
+                sn += f' — {s}'
+            cmd += f' --edit track:s{tid} --set language={sl} --set name={quote(sn)} --set flag-forced={1 if forced is True else 0}'
+            tid += 1
+        title = f.stem.replace(args.repl, "")
+        cmd += f' --edit info --set title={quote(title)}'
         os.system(cmd)
