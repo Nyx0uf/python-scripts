@@ -5,10 +5,11 @@
 MKV file helper
 """
 
-import subprocess
 import json
 from pathlib import Path
 from typing import List, Dict
+from shlex import quote
+from utils import common
 
 # Video codecs
 CODEC_VIDEO_MPEG2 = str("mpeg-1/2")
@@ -121,6 +122,8 @@ class MkvTrack:
                 self.lang = str(language.lower())
             if "audio_channels" in properties:
                 self.audio_channels = int(properties["audio_channels"])
+            if "audio_bits_per_sample" in properties:
+                self.audio_bits = int(properties["audio_bits_per_sample"])
 
     def __str__(self):
         return "{}:{}|{}".format(self.id, self.name, self.lang)
@@ -199,14 +202,12 @@ class MkvFile:
     def __eq__(self, other):
         return self.path == other.path
 
+    def video_codec_desc(self) -> str:
+        """return smth like AVC High10@L4.1 24fps"""
+        return common.system_call(f'mediainfo --Inform="Video;%Format% %Format_Profile% %FrameRate%fps" {quote(str(self.path))}').decode("utf-8").strip()
+
     @staticmethod
-    def get_file_infos(path: Path) -> str:
+    def get_file_infos(path: Path):
         """Invoke mkvmerge to get infos"""
-        try:
-            process = subprocess.Popen(['mkvmerge', '-J', str(path)], stdout=subprocess.PIPE)
-            (out, _) = process.communicate()
-            process.wait()
-            return json.loads(out)
-        except OSError as e:
-            print(e)
-            raise
+        a = common.system_call(f'mkvmerge -J {quote(str(path))}')
+        return json.loads(a)
