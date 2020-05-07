@@ -39,10 +39,8 @@ if __name__ == "__main__":
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single png file")
     args = parser.parse_args()
 
-    if common.which("pngquant") is None or common.which("optipng") is None:
-        common.abort("[!] pngquant / optipng not found in $PATH")
-
-    # Sanity check
+    # Sanity checks
+    common.ensure_exist(["pngquant", "optipng"])
     if args.src.exists() is False:
         common.abort(parser.format_help())
 
