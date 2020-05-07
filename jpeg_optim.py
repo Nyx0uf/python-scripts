@@ -21,14 +21,14 @@ def is_420_subsampled(path: Path) -> bool:
 
 def convert_to_420(path: Path) -> Path:
     """Subsample jpeg file"""
-    outfile = path.with_name(str(path.stem) + ".420").with_suffix("jpg")
+    outfile = path.with_name(str(path.stem) + ".420.jpg")
     cmd = f'convert {quote(str(path))} -sampling-factor "2x2,1x1,1x1" {quote(str(outfile))}'
     os.system(cmd)
     return outfile
 
 def jpegtran(path: Path, keep_metadata: bool) -> Path:
     """jpegtran"""
-    outfile = path.with_name(str(path.stem) + ".jpegtran").with_suffix("jpg")
+    outfile = path.with_name(str(path.stem) + ".jpegtran.jpg")
     cmd = f'jpegtran -optimize -copy {"all" if keep_metadata is True else "none"} -progressive -outfile {quote(str(outfile))} {quote(str(path))}'
     os.system(cmd)
     return outfile

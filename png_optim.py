@@ -14,24 +14,34 @@ from queue import Queue
 from shlex import quote
 from utils import common
 
+def pngquant(path: Path) -> Path:
+    """pngquant"""
+    outfile = path.with_name(f"{path.stem}.pngquant.png")
+    cmd = f"pngquant -f -o {quote(str(outfile))} --speed 1 --quality 75-100 --strip --skip-if-larger {quote(str(path))}"
+    os.system(cmd)
+    return outfile
+
+def optipng(path: Path) -> Path:
+    """optipng"""
+    outfile = path.with_name(f"{path.stem}.optipng.png")
+    cmd = f"optipng -quiet -o7 -preserve -out {quote(str(outfile))} {quote(str(path))}"
+    os.system(cmd)
+    return outfile
+
 def handle_png_files(p_queue: Queue):
     """pngquant + optipng"""
     while p_queue.empty() is False:
         original_png_file: Path = p_queue.get()
         print(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_png_file}")
         # pngquant
-        pngquanted = original_png_file.with_name(f"{original_png_file.stem}.pngquant.png")
-        os.system(f"pngquant -f -o {quote(str(pngquanted))} --speed 1 --quality 75-100 --strip --skip-if-larger {quote(str(original_png_file))}")
+        pngquanted = pngquant(original_png_file)
         # optipng
-        optimized = original_png_file.with_name(f"{original_png_file.stem}.optipng.png")
+        optimized = optipng(pngquanted if pngquanted.exists() else original_png_file)
         if pngquanted.exists():
-            os.system(f"optipng -quiet -o7 -preserve -out {quote(str(optimized))} {quote(str(pngquanted))}")
             pngquanted.unlink()
-        else:
-            os.system(f"optipng -quiet -o7 -preserve -out {quote(str(optimized))} {quote(str(original_png_file))}")
-        original_png_file.unlink()
-        # Rename optimized version to original
-        optimized.rename(original_png_file)
+        if optimized.exists():
+            original_png_file.unlink()
+            optimized.rename(original_png_file)
         p_queue.task_done()
 
 if __name__ == "__main__":
