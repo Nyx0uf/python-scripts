@@ -2,17 +2,19 @@
 # coding: utf-8
 
 """
-bla.
+Optimize a directory of manga scans :
+- Convert grayscale images to png
+- Convert color images to jpg
+- Optimize jpg & png files
+- Compress directory
 """
 
 import os
 import argparse
 import imghdr
-import multiprocessing
 import time
 from pathlib import Path
 from queue import Queue
-from threading import Thread
 from shlex import quote
 
 import numpy
@@ -34,7 +36,7 @@ __kernel void isGrey(read_only image2d_t src, __global unsigned int* color)
 }
 """
 
-def cl_is_grey(p_rgb, p_cl_context, p_cl_queue, p_cl_program) -> bool:
+def cl_is_grey(p_rgb, p_cl_context: cl.Context, p_cl_queue: cl.CommandQueue, p_cl_program: cl.Program) -> bool:
     """Check if an image is grey using OpenCL"""
     pixels = numpy.array(p_rgb)
     dev_buf = cl.image_from_array(p_cl_context, pixels, 4)
@@ -58,36 +60,18 @@ def save_to_format(p_queue: Queue, fmt: str):
         original_file.unlink()
         p_queue.task_done()
 
-def optimize_png(p_queue: Queue):
-    """pngquant + optipng"""
-    while p_queue.empty() is False:
-        original_png_file: Path = p_queue.get()
-        pngquanted = "{}.pngquant.png".format(str(original_png_file))
-        cmd = "pngquant -f -o {} --speed 1 --quality 100 --strip {}".format(quote(pngquanted), quote(str(original_png_file)))
-        os.system(cmd)
-        optimized = "{}.optipng.png".format(pngquanted)
-        cmd = 'optipng -quiet -o7 -preserve -out {} {}'.format(quote(optimized), quote(pngquanted))
-        os.system(cmd)
-        os.remove(pngquanted) # Remove pngquant
-        os.remove(original_png_file) # Remove original
-        # Rename optimized version to original
-        os.rename(optimized, original_png_file)
-        p_queue.task_done()
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
+    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to manga directory")
     args = parser.parse_args()
 
-    # Sanity check
-    if args.src.exists() is False:
+    # Sanity checks
+    path = args.src.resolve()
+    if path.exists() is False or path.is_dir() is False:
         common.abort(parser.format_help())
 
     # Get files list
-    path = args.src.resolve()
-    if path.is_dir() is False:
-        common.abort(parser.format_help())
-    all_files = common.walk_directory(path, lambda x: x.suffix in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff"])
+    all_files = common.list_directory(path, lambda x: x.suffix in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff"])
     print(f"{common.COLOR_WHITE}[+] {len(all_files)} file(s) to analyze…")
 
     # Analyze files
@@ -97,70 +81,51 @@ if __name__ == "__main__":
     cl_ctx = cl.create_some_context()
     cl_queue = cl.CommandQueue(cl_ctx)
     cl_program = cl.Program(cl_ctx, CL_KERNEL).build()
-    for file in all_files:
-        img = Image.open(file).convert('RGBA')
+    for f in all_files:
+        img = Image.open(f).convert('RGBA')
         is_grey = cl_is_grey(img, cl_ctx, cl_queue, cl_program)
-        if is_grey is True and imghdr.what(file) != "png":
-            q_grey_conv.put(file)
-        elif is_grey is False and imghdr.what(file) == "png":
-            q_color_conv.put(file)
+        if is_grey is True and imghdr.what(f) != "png":
+            q_grey_conv.put(f)
+        elif is_grey is False and imghdr.what(f) == "png":
+            q_color_conv.put(f)
     t_end = time.time()
     grey_count = q_grey_conv.qsize()
     color_count = q_color_conv.qsize()
-    print("{} ↳ Done in {:.2f}s :".format(common.COLOR_GREEN, (t_end - t_start)))
+    print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s :")
     print(f"{common.COLOR_PURPLE}\t→ {grey_count} grayscaled file(s) need to be converted")
     print(f"{common.COLOR_PURPLE}\t→ {color_count} colorized file(s) need to be converted")
 
     # Convert grayscaled images to png
     if grey_count > 0:
         print(f"{common.COLOR_WHITE}[+] Converting {grey_count} grayscaled files…")
-        t_start = time.time()
-        for i in range(multiprocessing.cpu_count()):
-            th = Thread(target=save_to_format, args=(q_grey_conv, ".png"))
-            th.setDaemon(True)
-            th.start()
-        q_grey_conv.join()
-        t_end = time.time()
-        print("{} ↳ Done in {:.2f}s".format(common.COLOR_GREEN, (t_end - t_start)))
+        t = common.parallel(save_to_format, (q_grey_conv, ".png", ))
+        print(f"{common.COLOR_GREEN} ↳ Done in {t:4.2f}s")
 
     # Convert colorized images to jpg
     if color_count > 0:
         print(f"{common.COLOR_WHITE}[+] Converting {color_count} colorized files…")
-        t_start = time.time()
-        for i in range(multiprocessing.cpu_count()):
-            th = Thread(target=save_to_format, args=(q_color_conv, ".jpg"))
-            th.setDaemon(True)
-            th.start()
-        q_color_conv.join()
-        t_end = time.time()
-        print("{} ↳ Done in {:.2f}s".format(common.COLOR_GREEN, (t_end - t_start)))
+        t = common.parallel(save_to_format, (q_color_conv, ".jpg", ))
+        print(f"{common.COLOR_GREEN} ↳ Done in {t:4.2f}s")
 
-    # Optimize png (pngquant + optipng)
-    png_files = common.walk_directory(path, lambda x: os.path.splitext(x)[1] in [".png"])
+    # Optimize png
+    png_files = common.list_directory(path, lambda x: x.suffix == ".png")
     print(f"{common.COLOR_WHITE}[+] Optimizing {len(png_files)} PNG files…")
     t_start = time.time()
-    q_png = Queue()
-    for png in png_files:
-        q_png.put(png)
-    for i in range(multiprocessing.cpu_count()):
-        th = Thread(target=optimize_png, args=(q_png,))
-        th.setDaemon(True)
-        th.start()
-    q_png.join()
+    os.system(f"png_optim.py -src {quote(str(path))}")
     t_end = time.time()
-    print("{} ↳ Done in {:.2f}s".format(common.COLOR_GREEN, (t_end - t_start)))
+    print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
 
     # Optimize jpg
-    jpg_files = common.walk_directory(path, lambda x: os.path.splitext(x)[1] in [".jpg", ".jpeg"])
+    jpg_files = common.list_directory(path, lambda x: x.suffix in [".jpg", ".jpeg"])
     print(f"{common.COLOR_WHITE}[+] Optimizing {len(jpg_files)} JPEG files…")
     t_start = time.time()
-    os.system(f"~/Dropbox/scripts/jpeg_optim.py -src {quote(args.src)} -ss")
+    os.system(f"jpeg_optim.py -src {quote(str(path))} -ss")
     t_end = time.time()
-    print("{} ↳ Done in {:.2f}s".format(common.COLOR_GREEN, (t_end - t_start)))
+    print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
 
     # txz
     print(f"{common.COLOR_WHITE}[+] Compressing {path}")
     t_start = time.time()
-    os.system(f'XZ_OPT="-T 0 -9" tar -Jcvf {quote(path + ".txz")} {quote(path)}')
+    os.system(f'XZ_OPT="-T 0 -9" tar -Jcf {quote(str(path) + ".txz")} {quote(str(path))}')
     t_end = time.time()
-    print("{} ↳ Done in {:.2f}s".format(common.COLOR_GREEN, (t_end - t_start)))
+    print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
