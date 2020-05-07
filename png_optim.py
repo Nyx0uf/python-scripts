@@ -35,6 +35,13 @@ def optipng(path: Path) -> Path:
     os.system(cmd)
     return outfile
 
+def zopflipng(path: Path) -> Path:
+    """zopflipng"""
+    outfile = path.with_name(f"{path.stem}.zopflipng.png")
+    cmd = f"zopflipng --iterations=50 --filters=01234mepb --lossy_transparent {quote(str(path))} {quote(str(outfile))}"
+    os.system(cmd)
+    return outfile
+
 def handle_png_files(p_queue: Queue):
     """pngquant + optipng"""
     while p_queue.empty() is False:
@@ -42,8 +49,8 @@ def handle_png_files(p_queue: Queue):
         print_info(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_png_file}")
         # pngquant
         pngquanted = pngquant(original_png_file)
-        # optipng
-        optimized = optipng(pngquanted if pngquanted.exists() else original_png_file)
+        # zopflipng
+        optimized = zopflipng(pngquanted if pngquanted.exists() else original_png_file)
         if pngquanted.exists():
             pngquanted.unlink()
         if optimized.exists():
@@ -58,7 +65,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Sanity checks
-    common.ensure_exist(["pngquant", "optipng"])
+    common.ensure_exist(["pngquant", "zopflipng"])
     if args.src.exists() is False:
         common.abort(parser.format_help())
 
