@@ -14,6 +14,13 @@ from queue import Queue
 from shlex import quote
 from utils import common
 
+VERBOSE = False
+
+def print_info(x):
+    """Only print if verbose"""
+    if VERBOSE is True:
+        print(x)
+
 def pngquant(path: Path) -> Path:
     """pngquant"""
     outfile = path.with_name(f"{path.stem}.pngquant.png")
@@ -32,7 +39,7 @@ def handle_png_files(p_queue: Queue):
     """pngquant + optipng"""
     while p_queue.empty() is False:
         original_png_file: Path = p_queue.get()
-        print(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_png_file}")
+        print_info(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_png_file}")
         # pngquant
         pngquanted = pngquant(original_png_file)
         # optipng
@@ -46,7 +53,8 @@ def handle_png_files(p_queue: Queue):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single png file")
+    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single file")
+    parser.add_argument('-v', action='store_true', dest="verbose", default=False, help="verbode mode")
     args = parser.parse_args()
 
     # Sanity checks
@@ -58,9 +66,9 @@ if __name__ == "__main__":
     files = common.walk_directory(args.src.resolve(), lambda x: imghdr.what(x) == "png")
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
-    print(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
+    print_info(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
 
     # Optimize
     t = common.parallel(handle_png_files, (queue,))
     bytes_saved = total_original_bytes - sum(x.stat().st_size for x in files)
-    print(f"{common.COLOR_WHITE}[+] {bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")
+    print_info(f"{common.COLOR_WHITE}[+] {bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")
