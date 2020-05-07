@@ -40,7 +40,7 @@ if __name__ == "__main__":
         cmd = f'mkvpropedit {quote(str(f))}'
         # Handle video track
         vtrack: mkvfile.MkvTrack = list(filter(lambda x: x.type == "video", mkv.tracks))[0]
-        vn = f'{args.video_lang.upper()} — {mkv.video_codec_desc()} — {args.video_name if args.video_name is not None else vtrack.codec}'
+        vn = f'{args.video_lang.upper()} — {mkv.video_codec_desc()}{" — " + args.video_name if args.video_name is not None else ""}'
         cmd += f' --edit track:v1 --set language={args.video_lang} --set name={quote(vn)}'
         # Handle audio tracks
         atracks: List[mkvfile.MkvTrack] = list(filter(lambda x: x.type == "audio", mkv.tracks))
