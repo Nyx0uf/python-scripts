@@ -26,10 +26,10 @@ def is_420_subsampled(path: Path) -> bool:
     ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {str(path)}").decode("utf-8").strip()
     return '2x2,1x1,1x1' in ch
 
-def convert_to_420(path: Path) -> Path:
+def convert_to_420_and_optimize(path: Path, keep_metadata: bool) -> Path:
     """Subsample jpeg file"""
     outfile = path.with_name(str(path.stem) + ".420.jpg")
-    cmd = f'convert {quote(str(path))} -sampling-factor "2x2,1x1,1x1" {quote(str(outfile))}'
+    cmd = f'convert {quote(str(path))} -sampling-factor "2x2,1x1,1x1" jpeg:- | jpegtran -optimize -copy {"all" if keep_metadata is True else "none"} -progressive -outfile {quote(str(outfile))}'
     os.system(cmd)
     return outfile
 
@@ -45,23 +45,20 @@ def handle_jpeg_files(p_queue: Queue, keep_metadata: bool, subsample: bool):
     while p_queue.empty() is False:
         original_jpeg_file: Path = p_queue.get()
 
-        file_to_optimize = original_jpeg_file
         # Subsample if needed
         if subsample is True and is_420_subsampled(original_jpeg_file) is False:
             print_info(f"{common.COLOR_WHITE}[+] Subsampling {common.COLOR_YELLOW}{original_jpeg_file}")
-            subsampled = convert_to_420(original_jpeg_file)
+            subsampled = convert_to_420_and_optimize(original_jpeg_file, keep_metadata)
             if subsampled.exists():
-                file_to_optimize = subsampled
-        # Optimize
-        print_info(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{file_to_optimize}")
-        optimized = jpegtran(file_to_optimize, keep_metadata)
-        if optimized.exists():
-            original_jpeg_file.unlink() # Remove original jpeg
-            if file_to_optimize != original_jpeg_file:
-                # Remove eventual intermediate subsampled file
-                file_to_optimize.unlink()
-            # Rename optimized version to original
-            optimized.rename(original_jpeg_file)
+                original_jpeg_file.unlink()
+                subsampled.rename(original_jpeg_file)
+        else:
+            # Optimize
+            print_info(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_jpeg_file}")
+            optimized = jpegtran(original_jpeg_file, keep_metadata)
+            if optimized.exists():
+                original_jpeg_file.unlink()
+                optimized.rename(original_jpeg_file)
 
         p_queue.task_done()
 
