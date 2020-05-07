@@ -28,9 +28,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Sanity checks
-    if common.which("mkvmerge") is None:
-        common.abort("[!] mkvtoolnix not found in $PATH")
-
+    common.ensure_exist(["mkvmerge"])
     if args.src.exists() is False or args.src.is_dir() is False:
         common.abort(parser.format_help())
 

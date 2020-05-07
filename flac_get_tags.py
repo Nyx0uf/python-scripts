@@ -41,10 +41,8 @@ if __name__ == "__main__":
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
     args = parser.parse_args()
 
-    if common.which("metaflac") is None:
-        common.abort("[!] flac not found in $PATH")
-
-    # Sanity check
+    # Sanity checks
+    common.ensure_exist(["metaflac"])
     if args.src.exists() is False:
         common.abort(parser.format_help())
 

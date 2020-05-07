@@ -41,10 +41,8 @@ if __name__ == "__main__":
     parser.add_argument("-b", action="store", dest="blocks", type=common.str2bool, default=False, help="only remove PADDING, PICTURE and SEEKTABLE blocks")
     args = parser.parse_args()
 
-    if common.which("metaflac") is None:
-        common.abort("[!] flac not found in $PATH")
-
-    # Sanity check
+    # Sanity checks
+    common.ensure_exist(["metaflac"])
     if args.src.exists() is False:
         common.abort(parser.format_help())
 

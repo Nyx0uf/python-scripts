@@ -121,9 +121,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Sanity checks
-    if common.which("ffmpeg") is None:
-        common.abort("[!] ffmpeg not found in $PATH")
-
+    common.ensure_exist(["ffmpeg"])
     if args.src.exists() is False:
         common.abort(parser.format_help())
 
