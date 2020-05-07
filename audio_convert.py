@@ -117,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("-sr", action="store", dest="sr", type=str, help="Samplerate in Hertz")
     parser.add_argument("-bd", action="store", dest="bd", type=str, help="Bit depth (8/16/24/32)")
     parser.add_argument("-ext", action="store", dest="ext", type=str, help="Force output file extension (ex for aac, .aac instead of .m4a)")
-    parser.add_argument("-d", action="store", dest="delete", type=common.str2bool, default=False, help="Delete original file")
+    parser.add_argument("-d", action="store_true", dest="delete", default=False, help="Delete original file")
     args = parser.parse_args()
 
     # Sanity checks
