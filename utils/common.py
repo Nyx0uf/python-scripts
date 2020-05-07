@@ -53,7 +53,7 @@ def list_directory(path: Path, filt=None, sort=False) -> List[Path]:
 
 
 def walk_directory(path: Path, filt=None) -> List[Path]:
-    """walk a directory"""
+    """walk directory at `path`. (returns all files within subdirectories)"""
     ret: List[Path] = []
     if path.is_dir() is False:
         if filt is None or callable(filt) is False:
@@ -90,7 +90,7 @@ def which(program: str) -> str:
 
     return None
 
-def as_queue(lst) -> Queue:
+def as_queue(lst: list) -> Queue:
     """returns `lst` as a Queue"""
     q = Queue()
     for x in lst:
@@ -110,7 +110,7 @@ def parallel(fct, args: tuple) -> float:
 
 def abort(msg: str = None):
     """Exits the program and optionally display `msg`"""
-    if msg is not None:
+    if msg:
         print(msg)
     sys.exit(-1)
 
@@ -118,3 +118,9 @@ def system_call(command: str) -> str:
     """Execute `command` and returns stdout"""
     process = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
     return process.stdout.read()
+
+def ensure_exist(programs: List[str]):
+    """Exits if one of `programs` does not exist"""
+    for p in programs:
+        if which(p) is None:
+            abort(f"[!] {p} not found in $PATH")
