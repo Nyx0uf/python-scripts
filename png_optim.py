@@ -38,7 +38,7 @@ def optipng(path: Path) -> Path:
 def zopflipng(path: Path) -> Path:
     """zopflipng"""
     outfile = path.with_name(f"{path.stem}.zopflipng.png")
-    cmd = f"zopflipng --iterations=50 --filters=01234mepb --lossy_transparent {quote(str(path))} {quote(str(outfile))}"
+    cmd = f"zopflipng --iterations=50 --filters=01234mepb --lossy_transparent {quote(str(path))} {quote(str(outfile))} > /dev/null"
     os.system(cmd)
     return outfile
 
@@ -61,8 +61,9 @@ def handle_png_files(p_queue: Queue):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single file")
-    parser.add_argument('-v', action='store_true', dest="verbose", default=False, help="verbode mode")
+    parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
     args = parser.parse_args()
+    VERBOSE = args.verbose
 
     # Sanity checks
     common.ensure_exist(["pngquant", "zopflipng"])
