@@ -109,6 +109,7 @@ class MkvTrack:
         self.type = str(json_data["type"].lower())
         self.codec = str(json_data["codec"].lower())
         self.file_extension = str(CODEC_EXTENSION_MAP[self.codec])
+        self.audio_bits = None
         properties = json_data["properties"]
         if properties is not None:
             self.uid = int(properties["uid"])
