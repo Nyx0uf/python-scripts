@@ -8,6 +8,7 @@ Optimize jpeg files with jpegtran/mozjpeg
 from __future__ import division
 import os
 import argparse
+import imghdr
 from pathlib import Path
 from queue import Queue
 from shlex import quote
@@ -20,16 +21,15 @@ def is_420_subsampled(path: Path) -> bool:
 
 def convert_to_420(path: Path) -> Path:
     """Subsample jpeg file"""
-    outfile = path.with_name(str(path.stem) + ".420.jpg")
-    cmd_convert = f'convert {quote(str(path))} -sampling-factor "2x2,1x1,1x1" {quote(str(outfile))}'
-    os.system(cmd_convert)
+    outfile = path.with_name(str(path.stem) + ".420").with_suffix("jpg")
+    cmd = f'convert {quote(str(path))} -sampling-factor "2x2,1x1,1x1" {quote(str(outfile))}'
+    os.system(cmd)
     return outfile
 
 def jpegtran(path: Path, keep_metadata: bool) -> Path:
     """jpegtran"""
-    outfile = path.with_name(str(path.stem) + ".jpegtran.jpg")
-    metadata = "-copy all" if keep_metadata is True else "-copy none"
-    cmd = f'jpegtran -optimize {metadata} -progressive -outfile {quote(str(outfile))} {quote(str(path))}'
+    outfile = path.with_name(str(path.stem) + ".jpegtran").with_suffix("jpg")
+    cmd = f'jpegtran -optimize -copy {"all" if keep_metadata is True else "none"} -progressive -outfile {quote(str(outfile))} {quote(str(path))}'
     os.system(cmd)
     return outfile
 
@@ -40,15 +40,15 @@ def handle_jpeg_files(p_queue: Queue, keep_metadata: bool, subsample: bool):
 
         file_to_optimize = original_jpeg_file
         # Subsample if needed
-        if subsample is True and not is_420_subsampled(original_jpeg_file):
+        if subsample is True and is_420_subsampled(original_jpeg_file) is False:
             print(f"{common.COLOR_WHITE}[+] Subsampling {common.COLOR_YELLOW}{original_jpeg_file}")
             subsampled = convert_to_420(original_jpeg_file)
-            if subsampled.is_file():
+            if subsampled.exists():
                 file_to_optimize = subsampled
         # Optimize
         print(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{file_to_optimize}")
         optimized = jpegtran(file_to_optimize, keep_metadata)
-        if optimized.is_file():
+        if optimized.exists():
             original_jpeg_file.unlink() # Remove original jpeg
             if file_to_optimize != original_jpeg_file:
                 # Remove eventual intermediate subsampled file
@@ -65,17 +65,13 @@ if __name__ == "__main__":
     parser.add_argument('-m', action='store', dest="metadata", type=common.str2bool, default=False, help="Keep metadata flag")
     args = parser.parse_args()
 
-    if common.which("identify") is None or common.which("convert") is None:
-        common.abort("[!] ImageMagick not found in $PATH")
-    if common.which("jpegtran") is None:
-        common.abort("[!] jpegtran/mozjpeg not found in $PATH")
-
-    # Sanity check
+    # Sanity checks
+    common.ensure_exist(["identify", "convert", "jpegtran"])
     if args.src.exists() is False:
         common.abort(parser.format_help())
 
     # Get files list
-    files = common.walk_directory(args.src.resolve(), lambda x: x.suffix == ".jpg" or x.suffix == ".jpeg")
+    files = common.walk_directory(args.src.resolve(), lambda x: imghdr.what(x) == "jpeg")
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
     print(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
