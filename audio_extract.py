@@ -15,7 +15,9 @@ from pathlib import Path
 from queue import Queue
 from collections import namedtuple
 from shlex import quote
-from utils import common
+from utils import common, logger
+
+LOGGER: logger.Logger
 
 AudioStreamInfo = namedtuple('AudioStreamInfo', ['id', 'infos', 'title'])
 
@@ -62,29 +64,31 @@ def extract_audio(p_queue: Queue, fmt: str):
         streams = get_audio_streams(infos)
         for audio_stream in streams:
             outfile = f"{quote(str(infile))}.{audio_stream.id}"
-            ffmpeg = f"ffmpeg -i {quote(str(infile))} -v quiet -map 0:{audio_stream.id}"
+            cmd = f"ffmpeg -i {quote(str(infile))} -v quiet -map 0:{audio_stream.id}"
             if fmt == "wav":
-                ffmpeg += f" -c pcm_s16le {outfile}.wav"
+                cmd += f" -c pcm_s16le {outfile}.wav"
             else:
-                ffmpeg += f" -c copy {outfile}{extension_for_audio_info(audio_stream.infos)}"
-            print(ffmpeg)
-            os.system(ffmpeg)
+                cmd += f" -c copy {outfile}{extension_for_audio_info(audio_stream.infos)}"
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Extracting track {audio_stream.id} from {common.COLOR_YELLOW}{infile} with {common.COLOR_PURPLE}{cmd}")
+            os.system(cmd)
         p_queue.task_done()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
-    parser.add_argument("-fmt", action="store", dest="fmt", type=str, default="copy", help="Which format to export the audio to, between: copy, wav")
+    parser.add_argument("input", type=Path, help="Path to directory or single JPEG file")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
+    parser.add_argument("-f", "--format", dest="format", type=str, help="Which format to export the audio to, between: copy, wav")
     args = parser.parse_args()
+    LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["ffmpeg"])
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
     # Get a list of files
-    files = common.list_directory(args.src.resolve())
+    files = common.list_directory(args.input.resolve())
     queue = common.as_queue(files)
 
     # Extract
-    common.parallel(extract_audio, (queue, args.fmt,))
+    common.parallel(extract_audio, (queue, args.format,))

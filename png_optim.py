@@ -55,18 +55,18 @@ def handle_png_files(p_queue: Queue):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single file")
-    parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
+    parser.add_argument("input", type=Path, help="Path to directory or single PNG file")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["pngquant", "zopflipng"])
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
     # Get files list
-    files = common.walk_directory(args.src.resolve(), lambda x: imghdr.what(x) == "png")
+    files = common.walk_directory(args.input.resolve(), lambda x: imghdr.what(x) == "png")
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
     LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")

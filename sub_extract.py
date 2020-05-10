@@ -62,16 +62,16 @@ def extract_subtitles(p_queue: Queue):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or video file")
+    parser.add_argument("input", type=Path, help="Path to directory or single video file")
     args = parser.parse_args()
 
     # Sanity checks
     common.ensure_exist(["ffmpeg"])
-    if args.src.exists() is None:
+    if args.input.exists() is None:
         common.abort(parser.format_help())
 
     # Get a list of files
-    files = common.list_directory(args.src.resolve())
+    files = common.list_directory(args.input.resolve())
     queue = common.as_queue(files)
 
     # Extract

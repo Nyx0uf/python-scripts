@@ -31,18 +31,18 @@ def add_attachment(mkv: Path, attachment: Path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-asrc", action="store", dest="asrc", type=Path, help="Path to directory of attachments or single file")
-    parser.add_argument("-vsrc", action="store", dest="vsrc", type=Path, help="Path to directory or single video file (all files must be .mkv)")
+    parser.add_argument("attachments_path", type=Path, help="Path to directory of attachments or single file")
+    parser.add_argument("videos_path", type=Path, help="Path to directory or single video file (all files must be .mkv)")
     args = parser.parse_args()
 
     # Sanity checks
     common.ensure_exist(["mkvmerge", "mkvpropedit"])
-    if args.vsrc is None or args.asrc is None:
+    if args.videos_path is None or args.attachments_path is None:
         common.abort(parser.format_help())
 
     # Get a list of files
-    video_files = common.list_directory(args.vsrc.resolve(), lambda x: x.suffix == ".mkv", True)
-    attachments = common.list_directory(args.asrc.resolve())
+    video_files = common.list_directory(args.videos_path.resolve(), lambda x: x.suffix == ".mkv", True)
+    attachments = common.list_directory(args.attachments_path.resolve())
 
     # Add all attachments
     for video in video_files:

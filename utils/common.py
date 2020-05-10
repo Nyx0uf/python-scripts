@@ -117,7 +117,7 @@ def abort(msg: str = None):
 
 def system_call(command: str) -> str:
     """Execute `command` and returns stdout"""
-    process = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return process.stdout.read()
 
 def ensure_exist(programs: List[str]):

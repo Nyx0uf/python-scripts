@@ -27,24 +27,24 @@ def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory")
-    parser.add_argument("-sl", action="store", dest="sub_lang", type=str, default="fre", help="Subtitles lang (eng, fre, ...)")
-    parser.add_argument("-sn", action="store", dest="sub_name", type=str, default="SRT", help="Subtitles track name")
+    parser.add_argument("input", type=Path, help="Path to directory")
+    parser.add_argument("-l", "--sub-lang", dest="sub_lang", type=str, default="fre", help="Subtitles lang (eng, fre, ...)")
+    parser.add_argument("-n", "--sub-name", dest="sub_name", type=str, default="SRT", help="Subtitles track name")
     args = parser.parse_args()
 
     # Sanity checks
     common.ensure_exist(["mkvmerge"])
 
-    if args.src.exists() is False or args.src.is_dir() is False:
+    if args.input.exists() is False or args.input.is_dir() is False:
         common.abort(parser.format_help())
 
     if len(args.sub_lang) != 3:
         common.abort(parser.format_help())
 
     # list subs
-    subs_files = common.list_directory(args.src, lambda x: x.suffix in av.SUBTITLE_EXTENSIONS, True)
+    subs_files = common.list_directory(args.input, lambda x: x.suffix in av.SUBTITLE_EXTENSIONS, True)
     # list vids
-    video_files = common.list_directory(args.src, lambda x: x.suffix in av.VIDEO_EXTENSIONS, True)
+    video_files = common.list_directory(args.input, lambda x: x.suffix in av.VIDEO_EXTENSIONS, True)
 
     if len(subs_files) != len(video_files):
         common.abort(f"[!] Error: {len(subs_files)} sub files and {len(video_files)} video files")

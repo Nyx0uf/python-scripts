@@ -17,24 +17,24 @@ from utils import common
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to .mkv file")
-    parser.add_argument("-v", action="store", dest="videos", type=common.str2bool, default="True", help="flag: extract video tracks?")
-    parser.add_argument("-a", action="store", dest="audios", type=common.str2bool, default="True", help="flag: extract audio tracks?")
-    parser.add_argument("-s", action="store", dest="subtitles", type=common.str2bool, default="True", help="flag: extract subtitles tracks?")
-    parser.add_argument("-c", action="store", dest="chapters", type=common.str2bool, default="True", help="flag: extract chapters?")
-    parser.add_argument("-al", action="store", dest="audio_langs", type=str, default="all", help="Audio langs to extract [3 chars code, comma separated]")
-    parser.add_argument("-sl", action="store", dest="subtitles_langs", type=str, default="eng,fre,jpn", help="Subtitles langs to extract [3 chars code, comma separated]")
-    parser.add_argument("-st", action="store", dest="subtitles_types", type=str, default="ass,srt", help="Subtitles types to extract [all,ass,pgs,srt, comma separated]")
+    parser.add_argument("input", type=Path, help="Path to .mkv file")
+    parser.add_argument("-x", "--videos", dest="videos", type=common.str2bool, default="True", help="flag: extract video tracks?")
+    parser.add_argument("-y", "--audios", dest="audios", type=common.str2bool, default="True", help="flag: extract audio tracks?")
+    parser.add_argument("-z", "--subtitles", dest="subtitles", type=common.str2bool, default="True", help="flag: extract subtitles tracks?")
+    parser.add_argument("-c", "--chapters", dest="chapters", type=common.str2bool, default="True", help="flag: extract chapters?")
+    parser.add_argument("-l", "--audio-langs", dest="audio_langs", type=str, default="all", help="Audio langs to extract [3 chars code, comma separated]")
+    parser.add_argument("-m", "--subtitles-langs", dest="subtitles_langs", type=str, default="eng,fre,jpn", help="Subtitles langs to extract [3 chars code, comma separated]")
+    parser.add_argument("-t", "--subtitles-types", dest="subtitles_types", type=str, default="ass,srt", help="Subtitles types to extract [all,ass,pgs,srt, comma separated]")
     args = parser.parse_args()
 
     # Sanity checks
     common.ensure_exist(["mkvmerge", "mkvextract"])
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
-    mkv = mkvfile.MkvFile(args.src)
+    mkv = mkvfile.MkvFile(args.input)
     if mkv.is_valid is False:
-        common.abort(f"[!] Invalid mkv file <{args.src}>")
+        common.abort(f"[!] Invalid mkv file <{args.input}>")
 
     # Only tracks type we want
     allowed_track_types = list()
@@ -104,4 +104,4 @@ if __name__ == "__main__":
     os.system(mkvextract)
 
     if mkv.chaptered and args.chapters is True:
-        os.system(f"mkvextract chapters {quote(str(mkv.path))} > {quote(str(args.src))}.chap.xml")
+        os.system(f"mkvextract chapters {quote(str(mkv.path))} > {quote(str(args.input))}.chap.xml")
