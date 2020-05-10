@@ -61,20 +61,20 @@ def clean_flac(p_queue: Queue, metaflac: str, only_blocks: bool):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
-    parser.add_argument("-ob", action="store_true", dest="only_blocks", default=False, help="only remove PADDING, PICTURE and SEEKTABLE blocks")
-    parser.add_argument("-lt", action="store_true", dest="list_tags", default=False, help="Get a list of all tags")
-    parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
+    parser.add_argument("input", type=Path, help="Path to directory or single FLAC file")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
+    parser.add_argument("-b", "--only-blocks", dest="only_blocks", action="store_true", help="only remove PADDING, PICTURE and SEEKTABLE blocks")
+    parser.add_argument("-l", "--list-tags", dest="list_tags", action="store_true", help="Get a list of all tags across all files")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["metaflac"])
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
     # Get files list
-    files = common.walk_directory(args.src.resolve(), lambda x: x.suffix == ".flac")
+    files = common.walk_directory(args.input.resolve(), lambda x: x.suffix == ".flac")
     queue = common.as_queue(files)
     LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to consider")
 

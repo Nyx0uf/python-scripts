@@ -24,18 +24,18 @@ def merge_chapters(chaps: List[Path], vids: List[Path]):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory")
+    parser.add_argument("input", type=Path, help="Path to directory")
     args = parser.parse_args()
 
     # Sanity checks
     common.ensure_exist(["mkvmerge"])
-    if args.src.exists() is False or args.src.is_dir() is False:
+    if args.input.exists() is False or args.input.is_dir() is False:
         common.abort(parser.format_help())
 
     # list chapters
-    chaps_files = common.list_directory(args.src, lambda x: x.suffix == ".xml", True)
+    chaps_files = common.list_directory(args.input, lambda x: x.suffix == ".xml" or x.suffix == ".txt", True)
     # list vids
-    vids_files = common.list_directory(args.src, lambda x: x.suffix == ".mkv", True)
+    vids_files = common.list_directory(args.input, lambda x: x.suffix == ".mkv", True)
 
     if len(chaps_files) != len(vids_files):
         common.abort(f"[!] Error: {len(chaps_files)} chapter files and {len(vids_files)} video files")

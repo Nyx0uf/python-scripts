@@ -62,11 +62,11 @@ def save_to_format(p_queue: Queue, fmt: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to manga directory")
+    parser.add_argument("input", type=Path, help="Path to manga directory")
     args = parser.parse_args()
 
     # Sanity checks
-    path = args.src.resolve()
+    path = args.input.resolve()
     if path.exists() is False or path.is_dir() is False:
         common.abort(parser.format_help())
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     png_files = common.list_directory(path, lambda x: x.suffix == ".png")
     print(f"{common.COLOR_WHITE}[+] Optimizing {len(png_files)} PNG files…")
     t_start = time.time()
-    os.system(f"png_optim.py -src {quote(str(path))}")
+    os.system(f"png_optim.py {quote(str(path))}")
     t_end = time.time()
     print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     jpg_files = common.list_directory(path, lambda x: x.suffix in [".jpg", ".jpeg"])
     print(f"{common.COLOR_WHITE}[+] Optimizing {len(jpg_files)} JPEG files…")
     t_start = time.time()
-    os.system(f"jpeg_optim.py -src {quote(str(path))} -ss")
+    os.system(f"jpeg_optim.py -s {quote(str(path))}")
     t_end = time.time()
     print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
 

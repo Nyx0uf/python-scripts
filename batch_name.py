@@ -46,20 +46,20 @@ def rename(src: List[Path], pattern: str, zero: str, after: str, real=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
-    parser.add_argument("-bp", action="store", dest="bp", type=str, help="Before pattern")
-    parser.add_argument("-ap", action="store", dest="ap", type=str, help="After pattern")
-    parser.add_argument("-z", action="store_true", dest="zero", help="Numerote with zeros first", default=True)
+    parser.add_argument("input", type=Path, help="Path to directory")
+    parser.add_argument("-b", "--before-pattern", dest="before_pattern", type=str, help="Before pattern")
+    parser.add_argument("-a", "--after-pattern", dest="after_pattern", type=str, help="After pattern")
+    parser.add_argument("-z", "--zero", dest="zero", action="store_true", help="Numerote with zeros first")
     args = parser.parse_args()
 
     # Sanity check
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
     # If path is a directory, get a list of files
-    src_files = common.list_directory(args.src.resolve(), None, True)
+    src_files = common.list_directory(args.input.resolve(), None, True)
 
-    rename(src_files, args.bp if args.bp is not None else "", args.zero, args.ap, False)
+    rename(src_files, args.before_pattern if args.before_pattern is not None else "", args.zero, args.after_pattern, False)
     ok = input("Proceed (y/n) ? ")
     if common.str2bool(ok) is True:
-        rename(src_files, args.bp if args.bp is not None else "", args.zero, args.ap, True)
+        rename(src_files, args.before_pattern if args.before_pattern is not None else "", args.zero, args.after_pattern, True)

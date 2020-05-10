@@ -11,6 +11,7 @@ import multiprocessing
 import queue
 import datetime
 import csv
+from pathlib import Path
 from threading import Thread, Lock
 from typing import Dict, List
 import extract_msg # pip install extract_msg
@@ -75,13 +76,13 @@ def th_filter(p_queue: queue.Queue, results: List[Dict[str, str]], errors: List[
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=str, help="Directory containing emails")
-    parser.add_argument("-csv", action="store", dest="output", type=str, default=None, help="Output file (csv)")
-    parser.add_argument("-terms", action="store", dest="terms", type=str, default=None, help="Words to look for, comma separated (ex: work,car)")
+    parser.add_argument("input", type=Path, help="Directory containing emails")
+    parser.add_argument("-o", "--output", dest="output", type=str, default=None, help="Output file (csv)")
+    parser.add_argument("-t", "--terms", dest="terms", type=str, default=None, help="Words to look for, comma separated (ex: work,car)")
     args = parser.parse_args()
 
     # Sanity checks
-    if args.src is None:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
     terms: List[str] = []
@@ -89,7 +90,7 @@ if __name__ == "__main__":
         terms = args.terms.strip().split(',')
 
     # Get a list of files (.msg) and queue it
-    emails = common.walk_directory(os.path.abspath(args.src), lambda x: x.endswith(".msg"))
+    emails = common.walk_directory(os.path.abspath(args.input), lambda x: x.endswith(".msg"))
     queue = queue.Queue()
     for mail in emails:
         queue.put(mail)

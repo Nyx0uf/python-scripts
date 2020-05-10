@@ -119,40 +119,40 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
-    parser.add_argument("-fmt", action="store", dest="fmt", type=str, help="Output format")
-    parser.add_argument("-sr", action="store", dest="sr", type=str, help="Samplerate in Hertz")
-    parser.add_argument("-bd", action="store", dest="bd", type=str, help="Bit depth (8/16/24/32)")
-    parser.add_argument("-ext", action="store", dest="ext", type=str, help="Force output file extension (ex for aac, .aac instead of .m4a)")
-    parser.add_argument("-d", action="store_true", dest="delete", help="Delete original file")
-    parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
+    parser.add_argument("input", type=Path, help="Path to directory or single audio file")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
+    parser.add_argument("-f", "--format", dest="format", type=str, help="Output format")
+    parser.add_argument("-s", "--samplerate", dest="samplerate", type=str, help="Samplerate in Hertz (ex: 44100)")
+    parser.add_argument("-b", "--bit-depth", dest="bit_depth", type=str, help="Bit depth (8/16/24/32)")
+    parser.add_argument("-e", "--extension", dest="extension", type=str, help="Force output file extension (ex: for aac, .aac instead of .m4a)")
+    parser.add_argument("-d", "--delete", dest="delete", action="store_true", help="Delete original file")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["ffmpeg"])
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
-    if args.fmt is None:
+    if args.format is None:
         common.abort(parser.format_help())
 
-    if args.sr is not None and args.sr not in SUPPORTED_SAMPLERATES:
+    if args.samplerate is not None and args.samplerate not in SUPPORTED_SAMPLERATES:
         samplerates = '\n- '.join(SUPPORTED_SAMPLERATES)
-        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid samplerate {common.COLOR_WHITE}{args.sr}\n{common.COLOR_YELLOW}[+] Available samplerates:\n- {samplerates}")
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid samplerate {common.COLOR_WHITE}{args.samplerate}\n{common.COLOR_YELLOW}[+] Available samplerates:\n- {samplerates}")
 
-    if args.bd is not None and args.bd not in SUPPORTED_BIT_DEPTH:
+    if args.bit_depth is not None and args.bit_depth not in SUPPORTED_BIT_DEPTH:
         bds = '\n- '.join(SUPPORTED_BIT_DEPTH)
-        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid bit depth {common.COLOR_WHITE}{args.bd}\n{common.COLOR_YELLOW}[+] Available bit depth:\n- {bds}")
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid bit depth {common.COLOR_WHITE}{args.bit_depth}\n{common.COLOR_YELLOW}[+] Available bit depth:\n- {bds}")
 
-    out_format = args.fmt.lower()
+    out_format = args.format.lower()
     if is_valid_output_format(out_format) is False:
         formats = '\n- '.join(sorted(SUPPORTED_OUTPUT_TYPES.keys()))
         common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid format {common.COLOR_WHITE}{out_format}\n{common.COLOR_YELLOW}[+] Available formats:\n- {formats}")
 
     # Get a list of files
-    files = common.walk_directory(args.src.resolve(), is_valid_audio_file)
+    files = common.walk_directory(args.input.resolve(), is_valid_audio_file)
     queue = common.as_queue(files)
 
     # Convert
-    common.parallel(convert, (queue, out_format, args.sr, args.bd, args.ext, args.delete,))
+    common.parallel(convert, (queue, out_format, args.samplerate, args.bit_depth, args.extension, args.delete,))

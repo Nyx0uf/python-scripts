@@ -27,16 +27,16 @@ def fix_attachment(mkv: Path, attachment: mkvfile.MkvAttachment):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory of files or single mkv")
+    parser.add_argument("input", type=Path, help="Path to directory of files or single mkv")
     args = parser.parse_args()
 
     # Sanity checks
     common.ensure_exist(["mkvmerge", "mkvpropedit"])
-    if args.src.exists() is False:
+    if args.input.exists() is False:
         common.abort(parser.format_help())
 
     # Get a list of files
-    files = common.list_directory(args.src.resolve(), lambda x: x.suffix == ".mkv", True)
+    files = common.list_directory(args.input.resolve(), lambda x: x.suffix == ".mkv", True)
 
     for f in files:
         mkv = mkvfile.MkvFile(f)

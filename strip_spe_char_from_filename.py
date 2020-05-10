@@ -12,17 +12,16 @@ from utils import common
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-src", action="store", dest="src", type=Path, help="Path to directory")
+    parser.add_argument("input", type=Path, help="Path to directory or single file")
     args = parser.parse_args()
 
     # Sanity check
-    if args.src is None:
+    if args.input is None:
         common.abort(parser.format_help())
 
     # If path is a directory, get a list of files
-    my_src_path = args.src.resolve()
-    my_src_files = common.list_directory(my_src_path, None, True)
+    files = common.list_directory(args.input.resolve(), None, True)
 
-    for f in my_src_files:
+    for f in files:
         a = str(f).encode('utf-8', "ignore")
         os.rename(str(f), a)
