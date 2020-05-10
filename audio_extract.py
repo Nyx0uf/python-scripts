@@ -4,11 +4,10 @@
 """
 Extract all audio streams of a given movie or directory of movies
 [!] ffmpeg must be installed and in your $PATH
-ex: extract_audio.py -src /path/to/movies/
+ex: extract_audio.py /path/to/movies/
 """
 
 import os
-import subprocess
 import re
 import argparse
 from pathlib import Path
@@ -21,17 +20,10 @@ LOGGER: logger.Logger
 
 AudioStreamInfo = namedtuple('AudioStreamInfo', ['id', 'infos', 'title'])
 
-def get_file_infos(path: Path) -> str:
-    """ffmpeg -i `path`"""
-    try:
-        process = subprocess.Popen(['ffmpeg', '-hide_banner', '-i', str(path)], stderr=subprocess.PIPE)
-        (_, err) = process.communicate()
-        process.wait()
-        return err.decode("utf8")
-    except OSError as e:
-        if e.errno == 2:
-            raise NameError("ffmpeg not found.")
-        raise
+def get_file_infos(filepath: Path) -> str:
+    """ffmpeg -i `filepath`"""
+    data = common.system_call(f"ffmpeg -hide_banner -i {quote(str(filepath))}", True).decode("utf-8")
+    return data
 
 def get_audio_streams(infos: str):
     """Parse `ffmpeg -i` output to grab only audio streams"""
@@ -47,14 +39,14 @@ def extension_for_audio_info(audio_type: str) -> str:
         'flac': '.flac',
         'pcm_': '.wav',
         'true': '.thd',
-        'alac': '.m4a'
+        'alac': '.m4a',
+        'opus': '.opus',
     }
 
     def sanitize_type(x: str) -> str:
         """Clean extension"""
         return maps[x] if x in maps else x
-    extension = sanitize_type(audio_type[:4].strip())
-    return extension
+    return sanitize_type(audio_type[:4].strip().replace(",", "").lower())
 
 def extract_audio(p_queue: Queue, fmt: str):
     """Extract thread"""
@@ -63,21 +55,22 @@ def extract_audio(p_queue: Queue, fmt: str):
         infos = get_file_infos(infile)
         streams = get_audio_streams(infos)
         for audio_stream in streams:
-            outfile = f"{quote(str(infile))}.{audio_stream.id}"
+            outfile = f"{str(infile)}.{audio_stream.id}{'.wav' if fmt == 'wav' else extension_for_audio_info(audio_stream.infos)}"
             cmd = f"ffmpeg -i {quote(str(infile))} -v quiet -map 0:{audio_stream.id}"
             if fmt == "wav":
-                cmd += f" -c pcm_s16le {outfile}.wav"
+                cmd += f" -c pcm_s16le "
             else:
-                cmd += f" -c copy {outfile}{extension_for_audio_info(audio_stream.infos)}"
+                cmd += f" -c copy "
+            cmd += f"{quote(outfile)}"
             LOGGER.log(f"{common.COLOR_WHITE}[+] Extracting track {audio_stream.id} from {common.COLOR_YELLOW}{infile} with {common.COLOR_PURPLE}{cmd}")
             os.system(cmd)
         p_queue.task_done()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path, help="Path to directory or single JPEG file")
+    parser.add_argument("input", type=Path, help="Path to directory or single video file")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
-    parser.add_argument("-f", "--format", dest="format", type=str, help="Which format to export the audio to, between: copy, wav")
+    parser.add_argument("-f", "--format", dest="format", type=str, default="copy", help="Which format to export the audio to, between: copy, wav")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 

@@ -4,7 +4,7 @@
 """
 Convert an audio file or directory of audio files to the highest quality in the specified format
 [!] ffmpeg (with libfdk_aac, libvorbis, libopus) must be installed and in your $PATH
-ex: audio_convert.py -src /path/to/file.dts -fmt aac
+ex: audio_convert.py -fmt aac /path/to/file/or/dir
 """
 
 import os
@@ -121,11 +121,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single audio file")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
-    parser.add_argument("-f", "--format", dest="format", type=str, help="Output format")
+    parser.add_argument("-f", "--format", dest="format", type=str, help="Format to convert to")
     parser.add_argument("-s", "--samplerate", dest="samplerate", type=str, help="Samplerate in Hertz (ex: 44100)")
-    parser.add_argument("-b", "--bit-depth", dest="bit_depth", type=str, help="Bit depth (8/16/24/32)")
-    parser.add_argument("-e", "--extension", dest="extension", type=str, help="Force output file extension (ex: for aac, .aac instead of .m4a)")
-    parser.add_argument("-d", "--delete", dest="delete", action="store_true", help="Delete original file")
+    parser.add_argument("-b", "--bit-depth", dest="bit_depth", type=str, help="Bit depth between 8, 16, 24, 32")
+    parser.add_argument("-e", "--extension", dest="extension", type=str, help="Overwrite default output file extension (ex: for aac, .aac instead of .m4a)")
+    parser.add_argument("-d", "--delete", dest="delete", action="store_true", help="Delete original file after conversion")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 

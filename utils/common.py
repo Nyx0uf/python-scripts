@@ -115,13 +115,16 @@ def abort(msg: str = None):
     print(COLOR_WHITE)
     sys.exit(-1)
 
-def system_call(command: str) -> str:
-    """Execute `command` and returns stdout"""
-    process = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+def system_call(command: str, use_stderr=False) -> str:
+    """Execute `command` and returns stdout or stderr depending on `use_stderr`"""
+    if use_stderr is True:
+        process = subprocess.Popen([command], stderr=subprocess.PIPE, shell=True)
+        return process.stderr.read()
+    process = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
     return process.stdout.read()
 
 def ensure_exist(programs: List[str]):
     """Exits if one of `programs` does not exist"""
     for p in programs:
         if which(p) is None:
-            abort(f"[!] {p} not found in $PATH")
+            abort(f"{COLOR_RED}[!] {COLOR_WHITE}{p} {COLOR_RED}not found in $PATH")
