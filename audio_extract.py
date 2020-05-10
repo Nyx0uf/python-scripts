@@ -57,7 +57,7 @@ def extension_for_audio_info(audio_type: str) -> str:
 def extract_audio(p_queue: Queue, fmt: str):
     """Extract thread"""
     while p_queue.empty() is False:
-        infile = p_queue.get()
+        infile: Path = p_queue.get()
         infos = get_file_infos(infile)
         streams = get_audio_streams(infos)
         for audio_stream in streams:

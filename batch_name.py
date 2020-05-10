@@ -40,9 +40,8 @@ def rename(src: List[Path], pattern: str, zero: str, after: str, real=False):
             target_filename += after
         target_filename += val.suffix
         new_file = filepath.replace(filename, target_filename)
-        if real is False:
-            print(f"{common.COLOR_WHITE}{val}\n ↳ {common.COLOR_YELLOW}{new_file}{common.COLOR_WHITE}")
-        else:
+        print(f"{common.COLOR_WHITE}{val}\n ↳ {common.COLOR_YELLOW}{new_file}{common.COLOR_WHITE}")
+        if real is True:
             shutil.move(val, new_file)
 
 if __name__ == "__main__":
@@ -50,7 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or audio file")
     parser.add_argument("-bp", action="store", dest="bp", type=str, help="Before pattern")
     parser.add_argument("-ap", action="store", dest="ap", type=str, help="After pattern")
-    parser.add_argument("-z", action="store", dest="zero", type=common.str2bool, help="Numerote with zeros first", default=True)
+    parser.add_argument("-z", action="store_true", dest="zero", help="Numerote with zeros first", default=True)
     args = parser.parse_args()
 
     # Sanity check
@@ -58,9 +57,9 @@ if __name__ == "__main__":
         common.abort(parser.format_help())
 
     # If path is a directory, get a list of files
-    my_src_files = common.list_directory(args.src.resolve(), None, True)
+    src_files = common.list_directory(args.src.resolve(), None, True)
 
-    rename(my_src_files, args.bp if args.bp is not None else "", args.zero, args.ap, False)
+    rename(src_files, args.bp if args.bp is not None else "", args.zero, args.ap, False)
     ok = input("Proceed (y/n) ? ")
     if common.str2bool(ok) is True:
-        rename(my_src_files, args.bp if args.bp is not None else "", args.zero, args.ap, True)
+        rename(src_files, args.bp if args.bp is not None else "", args.zero, args.ap, True)

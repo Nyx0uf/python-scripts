@@ -12,14 +12,9 @@ import imghdr
 from pathlib import Path
 from queue import Queue
 from shlex import quote
-from utils import common
+from utils import common, logger
 
-VERBOSE = False
-
-def print_info(x):
-    """Only print if verbose"""
-    if VERBOSE is True:
-        print(x)
+LOGGER: logger.Logger
 
 def pngquant(path: Path) -> Path:
     """pngquant"""
@@ -46,7 +41,7 @@ def handle_png_files(p_queue: Queue):
     """pngquant + optipng"""
     while p_queue.empty() is False:
         original_png_file: Path = p_queue.get()
-        print_info(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_png_file}")
+        LOGGER.log(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_png_file}")
         # pngquant
         pngquanted = pngquant(original_png_file)
         # zopflipng
@@ -63,7 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single file")
     parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
     args = parser.parse_args()
-    VERBOSE = args.verbose
+    LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["pngquant", "zopflipng"])
@@ -74,9 +69,9 @@ if __name__ == "__main__":
     files = common.walk_directory(args.src.resolve(), lambda x: imghdr.what(x) == "png")
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
-    print_info(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
+    LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
 
     # Optimize
     t = common.parallel(handle_png_files, (queue,))
     bytes_saved = total_original_bytes - sum(x.stat().st_size for x in files)
-    print_info(f"{common.COLOR_WHITE}[+] {bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")
+    LOGGER.log(f"{common.COLOR_WHITE}[+] {bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")

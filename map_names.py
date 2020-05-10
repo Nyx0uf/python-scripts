@@ -18,9 +18,8 @@ def map_names(src: List[Path], dst: List[Path], real=False):
         src_filename = val.name
         target_file = dst[idx]
         new_file = target_file.with_name(src_filename)
-        if real is False:
-            print(f"{common.COLOR_WHITE}{target_file}\n ↳ {common.COLOR_YELLOW}{new_file}{common.COLOR_WHITE}")
-        else:
+        print(f"{common.COLOR_WHITE}{target_file}\n ↳ {common.COLOR_YELLOW}{new_file}{common.COLOR_WHITE}")
+        if real is True:
             shutil.move(target_file, new_file)
 
 if __name__ == "__main__":
