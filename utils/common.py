@@ -112,6 +112,7 @@ def abort(msg: str = None):
     """Exits the program and optionally display `msg`"""
     if msg:
         print(msg)
+    print(COLOR_WHITE)
     sys.exit(-1)
 
 def system_call(command: str) -> str:

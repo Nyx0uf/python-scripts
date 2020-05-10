@@ -33,7 +33,6 @@ if __name__ == "__main__":
 
     # Sanity checks
     common.ensure_exist(["mkvmerge"])
-
     if args.src.exists() is False or args.src.is_dir() is False:
         common.abort(parser.format_help())
 

@@ -13,7 +13,9 @@ from pathlib import Path
 from typing import List, Dict
 from shlex import quote
 from queue import Queue
-from utils import common, av
+from utils import av, common, logger
+
+LOGGER: logger.Logger
 
 SUPPORTED_OUTPUT_TYPES: Dict[str, str] = {
     str('aac'): str('.m4a'),
@@ -102,11 +104,16 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
 
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
+        if infile.suffix == out_extension:
+            LOGGER.log(f"{common.COLOR_WHITE}[+] No conversion needed for {common.COLOR_YELLOW}{infile}")
+            p_queue.task_done()
+            continue
         outfile = infile.with_suffix(out_extension)
-        print(f"[+] Converting <{infile}>")
         cmd = f"ffmpeg -i {quote(str(infile))} {ffmpeg_options} {quote(str(outfile))}"
+        LOGGER.log(f"{common.COLOR_WHITE}[+] Converting {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} with {common.COLOR_PURPLE}{cmd}")
         os.system(cmd)
         if delete is True:
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Removing {common.COLOR_YELLOW}{infile}")
             infile.unlink()
         p_queue.task_done()
 
@@ -117,8 +124,10 @@ if __name__ == "__main__":
     parser.add_argument("-sr", action="store", dest="sr", type=str, help="Samplerate in Hertz")
     parser.add_argument("-bd", action="store", dest="bd", type=str, help="Bit depth (8/16/24/32)")
     parser.add_argument("-ext", action="store", dest="ext", type=str, help="Force output file extension (ex for aac, .aac instead of .m4a)")
-    parser.add_argument("-d", action="store_true", dest="delete", default=False, help="Delete original file")
+    parser.add_argument("-d", action="store_true", dest="delete", help="Delete original file")
+    parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
     args = parser.parse_args()
+    LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["ffmpeg"])
@@ -129,17 +138,17 @@ if __name__ == "__main__":
         common.abort(parser.format_help())
 
     if args.sr is not None and args.sr not in SUPPORTED_SAMPLERATES:
-        samplerates = ', '.join(SUPPORTED_SAMPLERATES)
-        common.abort(f"Invalid samplerate: {args.sr}\nAvailable samplerates: {samplerates}")
+        samplerates = '\n- '.join(SUPPORTED_SAMPLERATES)
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid samplerate {common.COLOR_WHITE}{args.sr}\n{common.COLOR_YELLOW}[+] Available samplerates:\n- {samplerates}")
 
     if args.bd is not None and args.bd not in SUPPORTED_BIT_DEPTH:
-        bds = ', '.join(SUPPORTED_BIT_DEPTH)
-        common.abort(f"Invalid bit depth: {args.bd}\nAvailable bit depth: {bds}")
+        bds = '\n- '.join(SUPPORTED_BIT_DEPTH)
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid bit depth {common.COLOR_WHITE}{args.bd}\n{common.COLOR_YELLOW}[+] Available bit depth:\n- {bds}")
 
     out_format = args.fmt.lower()
     if is_valid_output_format(out_format) is False:
-        formats = ', '.join(sorted(SUPPORTED_OUTPUT_TYPES.keys()))
-        common.abort(f"Invalid format: {out_format}\nAvailable formats: {formats}")
+        formats = '\n- '.join(sorted(SUPPORTED_OUTPUT_TYPES.keys()))
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid format {common.COLOR_WHITE}{out_format}\n{common.COLOR_YELLOW}[+] Available formats:\n- {formats}")
 
     # Get a list of files
     files = common.walk_directory(args.src.resolve(), is_valid_audio_file)

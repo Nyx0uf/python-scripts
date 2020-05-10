@@ -12,14 +12,9 @@ import imghdr
 from pathlib import Path
 from queue import Queue
 from shlex import quote
-from utils import common
+from utils import common, logger
 
-VERBOSE = False
-
-def print_info(x):
-    """Only print if verbose"""
-    if VERBOSE is True:
-        print(x)
+LOGGER: logger.Logger
 
 def is_420_subsampled(path: Path) -> bool:
     """Check if the jpeg file at `path` is 420"""
@@ -47,14 +42,14 @@ def handle_jpeg_files(p_queue: Queue, keep_metadata: bool, subsample: bool):
 
         # Subsample if needed
         if subsample is True and is_420_subsampled(original_jpeg_file) is False:
-            print_info(f"{common.COLOR_WHITE}[+] Subsampling {common.COLOR_YELLOW}{original_jpeg_file}")
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Subsampling {common.COLOR_YELLOW}{original_jpeg_file}")
             subsampled = convert_to_420_and_optimize(original_jpeg_file, keep_metadata)
             if subsampled.exists():
                 original_jpeg_file.unlink()
                 subsampled.rename(original_jpeg_file)
         else:
             # Optimize
-            print_info(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_jpeg_file}")
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Optimizing {common.COLOR_YELLOW}{original_jpeg_file}")
             optimized = jpegtran(original_jpeg_file, keep_metadata)
             if optimized.exists():
                 original_jpeg_file.unlink()
@@ -67,9 +62,9 @@ if __name__ == "__main__":
     parser.add_argument("-src", action="store", dest="src", type=Path, default=Path("."), help="Path to directory or single file")
     parser.add_argument('-ss', action='store_true', dest="subsample", default=False, help="Subsample flag")
     parser.add_argument('-m', action='store_true', dest="keep_metadata", default=False, help="Keep metadata flag")
-    parser.add_argument('-v', action='store_true', dest="verbose", default=False, help="verbode mode")
+    parser.add_argument('-v', action='store_true', dest="verbose", help="verbode mode")
     args = parser.parse_args()
-    VERBOSE = args.verbose
+    LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["identify", "convert", "jpegtran"])
@@ -80,9 +75,9 @@ if __name__ == "__main__":
     files = common.walk_directory(args.src.resolve(), lambda x: imghdr.what(x) == "jpeg")
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
-    print_info(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
+    LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
 
     # Optimize
     t = common.parallel(handle_jpeg_files, (queue, args.keep_metadata, args.subsample,))
     bytes_saved = total_original_bytes - sum(x.stat().st_size for x in files)
-    print_info(f"{common.COLOR_WHITE}[+] {bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")
+    LOGGER.log(f"{common.COLOR_WHITE}[+] {bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")
