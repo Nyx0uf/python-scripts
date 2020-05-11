@@ -15,21 +15,26 @@ from shlex import quote
 from typing import List
 from utils import av, common
 
-def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str):
+def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str, delete: bool):
     """Merge `subs` into `vids` and output a .mkv file, assuming `subs` and `vids` are the exact same length"""
     flag_forced = "forced" in name.lower()
     for idx, _ in enumerate(subs):
         sub = subs[idx]
         vid = vids[idx]
-        str_vid = str(vid)
-        mkvmerge = f'mkvmerge -o {quote(str_vid + ".mkv")} {quote(str_vid)} --language 0:{lang} --track-name 0:{quote(name)} --forced-track 0:{flag_forced} {quote(str(sub))}'
+        outfile = vid.with_name(str(vid.stem) + ".subbed.mkv")
+        mkvmerge = f'mkvmerge -o {quote(str(outfile))} {quote(str(vid))} --language 0:{lang} --track-name 0:{quote(name)} --forced-track 0:{flag_forced} {quote(str(sub))}'
         os.system(mkvmerge)
+        if delete is True:
+            sub.unlink()
+            vid.unlink()
+            outfile.rename(vid)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
     parser.add_argument("-l", "--sub-lang", dest="sub_lang", type=str, default="fre", help="Subtitles lang, 3 chars code (eng, fre, …)")
     parser.add_argument("-n", "--sub-name", dest="sub_name", type=str, default="SRT", help="Subtitles track name")
+    parser.add_argument("-d", "--delete", dest="delete", action="store_true", help="Delete subtitle and video file and rename after merge")
     args = parser.parse_args()
 
     # Sanity checks
@@ -50,4 +55,4 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_RED}[!] ERROR: Number of files mismatch, subtitles={len(subs_files)} video={len(video_files)}{common.COLOR_WHITE}")
 
     # Merge
-    merge_subs(subs_files, video_files, args.sub_lang, args.sub_name)
+    merge_subs(subs_files, video_files, args.sub_lang, args.sub_name, args.delete)

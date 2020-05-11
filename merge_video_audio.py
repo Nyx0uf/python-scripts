@@ -15,20 +15,25 @@ from shlex import quote
 from typing import List
 from utils import av, common
 
-def merge_subs(audios: List[Path], vids: List[Path], lang: str, name: str):
+def merge_subs(audios: List[Path], vids: List[Path], lang: str, name: str, delete: bool):
     """Merge `audios` into `vids` as a .mkv file, assuming `audios` and `vids` are the exact same length"""
     for idx, _ in enumerate(audios):
         audio = audios[idx]
         vid = vids[idx]
-        str_vid = str(vid)
-        mkvmerge = f'mkvmerge -o {quote(str_vid + ".mkv")} {quote(str_vid)} --language 0:{lang} --track-name 0:{quote(name)} {quote(str(audio))}'
+        outfile = vid.with_name(str(vid.stem) + ".2.mkv")
+        mkvmerge = f'mkvmerge -o {quote(str(outfile))} {quote(str(vid))} --language 0:{lang} --track-name 0:{quote(name)} {quote(str(audio))}'
         os.system(mkvmerge)
+        if delete is True:
+            audio.unlink()
+            vid.unlink()
+            outfile.rename(vid)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
     parser.add_argument("-l", "--audio-lang", dest="audio_lang", type=str, default="eng", help="Audio lang, 3 chars code (eng, fre, …)")
     parser.add_argument("-n", "--audio-name", dest="audio_name", type=str, default="", help="Audio track name")
+    parser.add_argument("-d", "--delete", dest="delete", action="store_true", help="Delete audio and video file and rename after merge")
     args = parser.parse_args()
 
     # Sanity checks
@@ -48,4 +53,4 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_RED}[!] ERROR: Number of files mismatch, audio={len(audio_files)} video={len(video_files)}{common.COLOR_WHITE}")
 
     # Merge
-    merge_subs(audio_files, video_files, args.audio_lang, args.audio_name)
+    merge_subs(audio_files, video_files, args.audio_lang, args.audio_name, args.delete)
