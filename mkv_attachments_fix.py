@@ -27,7 +27,7 @@ def fix_attachment(mkv: Path, attachment: mkvfile.MkvAttachment):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path, help="Path to directory of files or single mkv")
+    parser.add_argument("input", type=Path, help="Path to directory or single MKV file")
     args = parser.parse_args()
 
     # Sanity checks

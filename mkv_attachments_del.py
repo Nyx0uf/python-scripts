@@ -16,8 +16,8 @@ from utils import mkvfile
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path, help="Path to directory or single file (all files must be .mkv)")
-    parser.add_argument("-type", dest="type", type=str, default="image", help="Type of attachments to remove (comma separated list, between font and image)")
+    parser.add_argument("input", type=Path, help="Path to directory or single MKV file")
+    parser.add_argument("-t", "--type", dest="type", type=str, default="image", help="Type of attachments to remove (comma separated list, between font and image)")
     args = parser.parse_args()
 
     # Sanity checks

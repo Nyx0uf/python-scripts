@@ -48,29 +48,23 @@ def extension_for_audio_info(audio_type: str) -> str:
         return maps[x] if x in maps else x
     return sanitize_type(audio_type[:4].strip().replace(",", "").lower())
 
-def extract_audio(p_queue: Queue, fmt: str):
+def extract_audio(p_queue: Queue):
     """Extract thread"""
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
         infos = get_file_infos(infile)
         streams = get_audio_streams(infos)
         for audio_stream in streams:
-            outfile = f"{str(infile)}.{audio_stream.id}{'.wav' if fmt == 'wav' else extension_for_audio_info(audio_stream.infos)}"
-            cmd = f"ffmpeg -i {quote(str(infile))} -v quiet -map 0:{audio_stream.id}"
-            if fmt == "wav":
-                cmd += f" -c pcm_s16le "
-            else:
-                cmd += f" -c copy "
-            cmd += f"{quote(outfile)}"
-            LOGGER.log(f"{common.COLOR_WHITE}[+] Extracting track {audio_stream.id} from {common.COLOR_YELLOW}{infile} with {common.COLOR_PURPLE}{cmd}")
+            outfile = f"{str(infile)}.{audio_stream.id}{extension_for_audio_info(audio_stream.infos)}"
+            cmd = f"ffmpeg -i {quote(str(infile))} -v quiet -map 0:{audio_stream.id} -c copy {quote(outfile)}"
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Extracting track {audio_stream.id} from {common.COLOR_YELLOW}{infile} with {common.COLOR_PURPLE}{cmd}{common.COLOR_WHITE}")
             os.system(cmd)
         p_queue.task_done()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single video file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
-    parser.add_argument("-f", "--format", dest="format", type=str, default="copy", help="Which format to export the audio to, between: copy, wav")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
@@ -84,4 +78,4 @@ if __name__ == "__main__":
     queue = common.as_queue(files)
 
     # Extract
-    common.parallel(extract_audio, (queue, args.format,))
+    common.parallel(extract_audio, (queue,))

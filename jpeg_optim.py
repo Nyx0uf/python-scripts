@@ -60,7 +60,7 @@ def handle_jpeg_files(p_queue: Queue, keep_metadata: bool, subsample: bool):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single JPEG file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
     parser.add_argument("-s", "--subsample", dest="subsample", action='store_true', help="Subsample image to 420 if needed")
     parser.add_argument("-m", "--keep-metadata", dest="keep_metadata", action='store_true', help="Don't delete metadata")
     args = parser.parse_args()

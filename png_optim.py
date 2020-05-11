@@ -56,7 +56,7 @@ def handle_png_files(p_queue: Queue):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single PNG file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
