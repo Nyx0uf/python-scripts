@@ -6,6 +6,9 @@ A/V Types
 """
 
 from typing import List
+from pathlib import Path
+from shlex import quote
+from utils import common
 
 AUDIO_EXTENSIONS: List[str] = [
     str('.aac'),
@@ -45,3 +48,8 @@ SUBTITLE_EXTENSIONS: List[str] = [
     str('.ssa'),
     str('.txt'),
 ]
+
+def get_file_infos(filepath: Path) -> str:
+    """ffmpeg -i `filepath`"""
+    data = common.system_call(f"ffmpeg -hide_banner -i {quote(str(filepath))}", True).decode("utf-8")
+    return data

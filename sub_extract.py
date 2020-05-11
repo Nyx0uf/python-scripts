@@ -14,16 +14,11 @@ from pathlib import Path
 from queue import Queue
 from collections import namedtuple
 from shlex import quote
-from utils import common, logger
+from utils import av, common, logger
 
 LOGGER: logger.Logger
 
 SubtitlesStreamInfo = namedtuple('SubtitlesStreamInfo', ['id', 'infos', 'extension', 'title'])
-
-def get_file_infos(filepath: Path) -> str:
-    """ffmpeg -i `filepath`"""
-    data = common.system_call(f"ffmpeg -hide_banner -i {quote(str(filepath))}", True).decode("utf-8")
-    return data
 
 def get_subs_streams(infos: str) -> str:
     """Parse `ffmpeg -i` output to grab only subtitles streams"""
@@ -45,7 +40,7 @@ def extract_subtitles(p_queue: Queue):
     """Extract thread"""
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
-        infos = get_file_infos(infile)
+        infos = av.get_file_infos(infile)
         streams = get_subs_streams(infos)
         for sub_stream in streams:
             outfile = f'{str(infile)}.{sub_stream.id}{sub_stream.extension}'

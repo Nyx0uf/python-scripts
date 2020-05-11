@@ -14,16 +14,11 @@ from pathlib import Path
 from queue import Queue
 from collections import namedtuple
 from shlex import quote
-from utils import common, logger
+from utils import av, common, logger
 
 LOGGER: logger.Logger
 
 AudioStreamInfo = namedtuple('AudioStreamInfo', ['id', 'infos', 'title'])
-
-def get_file_infos(filepath: Path) -> str:
-    """ffmpeg -i `filepath`"""
-    data = common.system_call(f"ffmpeg -hide_banner -i {quote(str(filepath))}", True).decode("utf-8")
-    return data
 
 def get_audio_streams(infos: str):
     """Parse `ffmpeg -i` output to grab only audio streams"""
@@ -52,7 +47,7 @@ def extract_audio(p_queue: Queue):
     """Extract thread"""
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
-        infos = get_file_infos(infile)
+        infos = av.get_file_infos(infile)
         streams = get_audio_streams(infos)
         for audio_stream in streams:
             outfile = f"{str(infile)}.{audio_stream.id}{extension_for_audio_info(audio_stream.infos)}"
