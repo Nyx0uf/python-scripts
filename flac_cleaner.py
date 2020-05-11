@@ -52,7 +52,7 @@ def clean_flac(p_queue: Queue, metaflac: str, only_blocks: bool):
     while p_queue.empty() is False:
         flac_file: Path = p_queue.get()
         sflac = str(flac_file)
-        LOGGER.log(f"{common.COLOR_WHITE}[+] Cleaning {common.COLOR_YELLOW}{sflac}")
+        LOGGER.log(f"{common.COLOR_WHITE}[+] Cleaning {common.COLOR_YELLOW}{sflac}{common.COLOR_WHITE}")
         if only_blocks is False:
             os.system(f'{metaflac} {quote(sflac)}')
         # Remove picture if any, padding, seektable
@@ -62,8 +62,8 @@ def clean_flac(p_queue: Queue, metaflac: str, only_blocks: bool):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single FLAC file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
-    parser.add_argument("-b", "--only-blocks", dest="only_blocks", action="store_true", help="only remove PADDING, PICTURE and SEEKTABLE blocks")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
+    parser.add_argument("-b", "--only-blocks", dest="only_blocks", action="store_true", help="Only remove PADDING, PICTURE and SEEKTABLE blocks")
     parser.add_argument("-l", "--list-tags", dest="list_tags", action="store_true", help="Get a list of all tags across all files")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)

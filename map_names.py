@@ -36,7 +36,7 @@ if __name__ == "__main__":
     src_files = common.list_directory(args.src.resolve(), sort=True)
     dst_files = common.list_directory(args.dst.resolve(), sort=True)
     if len(src_files) != len(dst_files):
-        common.abort(f"[!] Number of files mismatch: src={len(src_files)} dst={len(dst_files)}")
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Number of files mismatch, src={len(src_files)} dst={len(dst_files)}{common.COLOR_WHITE}")
 
     map_names(src_files, dst_files, False)
     ok = input("Proceed (y/n) ? ")

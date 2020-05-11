@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Sanity checks
     common.ensure_exist(["mkvmerge", "mkvpropedit"])
-    if args.videos_path is None or args.attachments_path is None:
+    if args.videos_path.exists() is False or args.attachments_path.exists() is False:
         common.abort(parser.format_help())
 
     # Get a list of files

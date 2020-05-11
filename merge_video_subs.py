@@ -28,7 +28,7 @@ def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
-    parser.add_argument("-l", "--sub-lang", dest="sub_lang", type=str, default="fre", help="Subtitles lang (eng, fre, ...)")
+    parser.add_argument("-l", "--sub-lang", dest="sub_lang", type=str, default="fre", help="Subtitles lang, 3 chars code (eng, fre, …)")
     parser.add_argument("-n", "--sub-name", dest="sub_name", type=str, default="SRT", help="Subtitles track name")
     args = parser.parse_args()
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     video_files = common.list_directory(args.input, lambda x: x.suffix in av.VIDEO_EXTENSIONS, True)
 
     if len(subs_files) != len(video_files):
-        common.abort(f"[!] Error: {len(subs_files)} sub files and {len(video_files)} video files")
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Number of files mismatch, subtitles={len(subs_files)} video={len(video_files)}{common.COLOR_WHITE}")
 
     # Merge
     merge_subs(subs_files, video_files, args.sub_lang, args.sub_name)

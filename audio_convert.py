@@ -105,22 +105,22 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
         if infile.suffix == out_extension:
-            LOGGER.log(f"{common.COLOR_WHITE}[+] No conversion needed for {common.COLOR_YELLOW}{infile}")
+            LOGGER.log(f"{common.COLOR_WHITE}[+] No conversion needed for {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE}")
             p_queue.task_done()
             continue
         outfile = infile.with_suffix(out_extension)
         cmd = f"ffmpeg -i {quote(str(infile))} {ffmpeg_options} {quote(str(outfile))}"
-        LOGGER.log(f"{common.COLOR_WHITE}[+] Converting {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} with {common.COLOR_PURPLE}{cmd}")
+        LOGGER.log(f"{common.COLOR_WHITE}[+] Converting {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} with {common.COLOR_PURPLE}{cmd}{common.COLOR_WHITE}")
         os.system(cmd)
         if delete is True:
-            LOGGER.log(f"{common.COLOR_WHITE}[+] Removing {common.COLOR_YELLOW}{infile}")
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Removing {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE}")
             infile.unlink()
         p_queue.task_done()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single audio file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbode mode")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
     parser.add_argument("-f", "--format", dest="format", type=str, help="Format to convert to")
     parser.add_argument("-s", "--samplerate", dest="samplerate", type=str, help="Samplerate in Hertz (ex: 44100)")
     parser.add_argument("-b", "--bit-depth", dest="bit_depth", type=str, help="Bit depth between 8, 16, 24, 32")

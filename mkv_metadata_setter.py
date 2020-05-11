@@ -18,12 +18,12 @@ from utils import mkvfile
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single MKV file")
-    parser.add_argument("-v", "--video-name", dest="video_name", type=str, default=None, help="Name of the video track")
     parser.add_argument("-a", "--audio-name", dest="audio_name", type=str, default=None, help="Name of the audio tracks, comma separated")
-    parser.add_argument("-s", "--sub-name", dest="sub_name", type=str, default=None, help="Name of the subtitles tracks, comma separated")
-    parser.add_argument("-x", "--video-lang", dest="video_lang", type=str, default="und", help="Lang of the video track")
-    parser.add_argument("-y", "--audio-lang", dest="audio_lang", type=str, default="jpn", help="Lang of the audio tracks, comma separated")
-    parser.add_argument("-z", "--sub-lang", dest="sub_lang", type=str, default="eng", help="Lang of the subtitles tracks, comma separated")
+    parser.add_argument("-b", "--sub-name", dest="sub_name", type=str, default=None, help="Name of the subtitles tracks, comma separated")
+    parser.add_argument("-c", "--video-name", dest="video_name", type=str, default=None, help="Name of the video track")
+    parser.add_argument("-x", "--audio-lang", dest="audio_lang", type=str, default="und", help="Lang of the audio tracks, comma separated")
+    parser.add_argument("-y", "--sub-lang", dest="sub_lang", type=str, default="eng", help="Lang of the subtitles tracks, comma separated")
+    parser.add_argument("-z", "--video-lang", dest="video_lang", type=str, default="und", help="Lang of the video track")
     parser.add_argument("-r", "--repl", dest="repl", type=str, default="", help="Pattern to replace for the Title")
     args = parser.parse_args()
 

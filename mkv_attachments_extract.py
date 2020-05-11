@@ -21,7 +21,7 @@ def extract_attachment(path: Path, attachment: mkvfile.MkvAttachment):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path, help="Path to directory or single file (all files must be .mkv)")
+    parser.add_argument("input", type=Path, help="Path to directory or single MKV file")
     parser.add_argument("-t", "--type", dest="type", type=str, default="font,image", help="Type of attachments to extract (comma separated list, between font and image)")
     args = parser.parse_args()
 

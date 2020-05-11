@@ -4,7 +4,7 @@
 """
 Extract tracks in a given .mkv file
 [!] mkvtoolnix must be installed and in your $PATH
-ex: mkv_explode.py -src /path/to/file.mkv
+ex: mkv_explode.py /path/to/file.mkv
 """
 
 import os
@@ -13,11 +13,14 @@ from pathlib import Path
 from shlex import quote
 from typing import List
 from utils import mkvfile
-from utils import common
+from utils import common, logger
+
+LOGGER: logger.Logger
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path, help="Path to .mkv file")
+    parser.add_argument("input", type=Path, help="Path to MKV file")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
     parser.add_argument("-x", "--videos", dest="videos", type=common.str2bool, default="True", help="flag: extract video tracks?")
     parser.add_argument("-y", "--audios", dest="audios", type=common.str2bool, default="True", help="flag: extract audio tracks?")
     parser.add_argument("-z", "--subtitles", dest="subtitles", type=common.str2bool, default="True", help="flag: extract subtitles tracks?")
@@ -26,6 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--subtitles-langs", dest="subtitles_langs", type=str, default="eng,fre,jpn", help="Subtitles langs to extract [3 chars code, comma separated]")
     parser.add_argument("-t", "--subtitles-types", dest="subtitles_types", type=str, default="ass,srt", help="Subtitles types to extract [all,ass,pgs,srt, comma separated]")
     args = parser.parse_args()
+    LOGGER = logger.Logger(args.verbose)
 
     # Sanity checks
     common.ensure_exist(["mkvmerge", "mkvextract"])
@@ -34,7 +38,7 @@ if __name__ == "__main__":
 
     mkv = mkvfile.MkvFile(args.input)
     if mkv.is_valid is False:
-        common.abort(f"[!] Invalid mkv file <{args.input}>")
+        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid mkv file {common.COLOR_WHITE}{args.input}")
 
     # Only tracks type we want
     allowed_track_types = list()
@@ -54,21 +58,21 @@ if __name__ == "__main__":
     for track in mkv.tracks:
         # Check if we want this track
         if track.type not in allowed_track_types:
-            print(f"[+] Track {track.id}: {track.type}, skipping...")
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Track {track.id}: {track.type}, skipping…")
             continue
 
         if track.file_extension is None:
-            print(f"[!] Track {track.id}: Unknown codec <{track.codec}>, skipping...")
+            LOGGER.log(f"{common.COLOR_WHITE}[+] Track {track.id}: Unknown codec {common.COLOR_YELLOW}{track.codec}{common.COLOR_WHITE}, skipping…")
             continue
 
         if track.type == "video":
             commands[track] = f"{track.id}:{quote(str(mkv.path))}.{track.id}.vid{track.file_extension}"
         else:
             if track.is_commentary():
-                print(f"[+] Track {track.id}: Commentary, skipping...")
+                LOGGER.log(f"{common.COLOR_WHITE}[+] Track {track.id}: Commentary, skipping…")
                 continue
             if track.lang is None:
-                print(f"[!] Track {track.id}: Unknown lang, skipping...")
+                LOGGER.log(f"{common.COLOR_WHITE}[+] Track {track.id}: Unknown lang, skipping…")
                 continue
 
             if track.type == "audio":
@@ -100,7 +104,7 @@ if __name__ == "__main__":
     mkvextract = f"mkvextract tracks {quote(str(mkv.path))} "
     for track, arg in commands.items():
         mkvextract += f"{arg} "
-    print(f"--\n{mkvextract}")
+    LOGGER.log(f"{common.COLOR_PURPLE}{mkvextract}{common.COLOR_WITE}")
     os.system(mkvextract)
 
     if mkv.chaptered and args.chapters is True:
