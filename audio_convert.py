@@ -94,7 +94,7 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
         ffmpeg_options += f" -ar {sr}"
 
     if bd is not None:
-        ffmpeg_options += f" -sample_fmt {bd}"
+        ffmpeg_options += f" -sample_fmt {BIT_DEPTH_MAP[bd]}"
 
     out_extension = SUPPORTED_OUTPUT_TYPES[fmt]
     if ext is not None:
