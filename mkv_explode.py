@@ -104,7 +104,7 @@ if __name__ == "__main__":
     mkvextract = f"mkvextract tracks {quote(str(mkv.path))} "
     for track, arg in commands.items():
         mkvextract += f"{arg} "
-    LOGGER.log(f"{common.COLOR_PURPLE}{mkvextract}{common.COLOR_WITE}")
+    LOGGER.log(f"{common.COLOR_PURPLE}{mkvextract}{common.COLOR_WHITE}")
     os.system(mkvextract)
 
     if mkv.chaptered and args.chapters is True:
