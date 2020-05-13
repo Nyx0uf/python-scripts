@@ -111,7 +111,7 @@ if __name__ == "__main__":
     png_files = common.list_directory(path, lambda x: x.suffix == ".png")
     print(f"{common.COLOR_WHITE}[+] Optimizing {len(png_files)} PNG files…")
     t_start = time.time()
-    os.system(f"png_optim.py {quote(str(path))}")
+    os.system(f"png_optim.py -v -q -z -n {quote(str(path))}")
     t_end = time.time()
     print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     jpg_files = common.list_directory(path, lambda x: x.suffix in [".jpg", ".jpeg"])
     print(f"{common.COLOR_WHITE}[+] Optimizing {len(jpg_files)} JPEG files…")
     t_start = time.time()
-    os.system(f"jpeg_optim.py -s {quote(str(path))}")
+    os.system(f"jpeg_optim.py -s -g -v {quote(str(path))}")
     t_end = time.time()
     print(f"{common.COLOR_GREEN} ↳ Done in {t_end - t_start:4.2f}s")
 
