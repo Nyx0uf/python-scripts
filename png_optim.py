@@ -38,7 +38,7 @@ def th_optimize(p_queue: Queue, programs: List[str]):
             outfile = infile.with_name(f"{infile.stem}.{prg}.png")
             cmd = command_for_filter(prg, last_file, outfile)
             if cmd is None:
-                LOGGER.log(f"{common.COLOR_RED}[!] ERROR: No command for {common.COLOR_YELLOW}{prg}{common.COLOR_WHITE}")
+                LOGGER.log(f"{common.COLOR_WHITE}[!] {common.COLOR_RED}ERROR: No command for {common.COLOR_YELLOW}{prg}{common.COLOR_WHITE}")
                 continue
             LOGGER.log(f"{common.COLOR_WHITE}[$] {common.COLOR_PURPLE}{cmd}")
             os.system(cmd)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     # Sanity checks
     if len(programs) == 0:
-        common.abort(f"{common.COLOR_RED}[!] ERROR: No programs specified{common.COLOR_WHITE}")
+        common.abort(f"{common.COLOR_WHITE}[!] {common.COLOR_RED}ERROR: No optimization programs specified or found, aborting…")
 
     # Get files list
     files = common.walk_directory(args.input.resolve(), lambda x: x.suffix == ".png")
