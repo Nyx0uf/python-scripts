@@ -63,10 +63,10 @@ def th_optimize(p_queue: Queue, programs: List[str]):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory or single PNG file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
-    parser.add_argument("-q", "--quant", dest="use_pngquant", action="store_true", help="Use pngquant (png8b)")
-    parser.add_argument("-z", "--zopfli", dest="use_zopfli", action="store_true", help="Use zopfli (very slow)")
-    parser.add_argument("-n", "--disable-optipng", dest="use_optipng", action="store_false", default=True, help="Disable optipng")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode, default: false")
+    parser.add_argument("-q", "--quant", dest="use_pngquant", action="store_true", help="Use pngquant, default: false")
+    parser.add_argument("-z", "--zopfli", dest="use_zopfli", action="store_true", help="Use zopfli (very slow), default: false")
+    parser.add_argument("-n", "--no-optipng", dest="use_optipng", action="store_false", default=True, help="Use optipng, default: true")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
