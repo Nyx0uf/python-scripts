@@ -12,19 +12,12 @@ from pathlib import Path
 from queue import Queue
 from shlex import quote
 from typing import List
-from utils import common, logger
+from utils import common, io, logger
 
 LOGGER: logger.Logger
 F_OPTIPNG = str("optipng")
 F_PNGQUANT = str("pngquant")
 F_ZOPFLI = str("zopfli")
-
-def is_png(path: Path) -> bool:
-    """returns true if `path` is a PNG file"""
-    with open(path, "rb") as f:
-        b = f.read(8)
-        return b == b"\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"
-    return False
 
 def command_for_filter(program: str, infile: Path, outfile: Path) -> str:
     """returns the command corresponding to `filt`"""
@@ -90,7 +83,7 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_WHITE}[!] {common.COLOR_RED}ERROR: No optimization programs specified or found, aborting…")
 
     # Get files list
-    files = common.walk_directory(args.input.resolve(), lambda x: is_png(x))
+    files = common.walk_directory(args.input.resolve(), lambda x: io.match_signature(x, [b"\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"]))
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
     LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")

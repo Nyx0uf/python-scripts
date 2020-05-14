@@ -60,3 +60,20 @@ def chown(path: Path, usr: str, grp: str):
 def tar_xz(src: Path, dst: Path):
     """XZ_OPT=-9 tar -Jcf"""
     os.system(f"XZ_OPT=-9 tar -Jcf {str(dst)} {str(src)}")
+
+def match_signature(path: Path, signatures: List[bytes]) -> bool:
+    """Check if `path` match a signature"""
+    def all_items_equal(lst: List) -> bool:
+        """Returns True if all items in `lst` are equal"""
+        return not lst or lst.count(lst[0]) == len(lst)
+    if all_items_equal(list(map(len, signatures))) is True:
+        with open(path, "rb") as f:
+            b = f.read(len(signatures[0]))
+            return b in signatures
+    else:
+        for s in signatures:
+            with open(path, "rb") as f:
+                b = f.read(len(s))
+                if b == s:
+                    return True
+    return False
