@@ -19,6 +19,13 @@ O_SUBSAMPLE = str("subsample")
 O_JPEGTRAN = str("jpegtran")
 O_GUETZLI = str("guetzli")
 
+def is_jpeg(path: Path) -> bool:
+    """returns true if `path` is a JPEG file"""
+    with open(path, "rb") as f:
+        b = f.read(4)
+        return b in [b"\xFF\xD8\xFF\xE0", b"\xFF\xD8\xFF\xE1", b"\xFF\xD8\xFF\xE2", b"\xFF\xD8\xFF\xEE", b"\xFF\xD8\xFF\xDB"]
+    return False
+
 def is_420_subsampled(path: Path) -> bool:
     """Check if the jpeg file at `path` is 420"""
     ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip()
@@ -92,7 +99,7 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_WHITE}[!] {common.COLOR_RED}ERROR: No optimization programs specified or found, aborting…")
 
     # Get files list
-    files = common.walk_directory(args.input.resolve(), lambda x: x.suffix == ".jpeg" or x.suffix == ".jpg")
+    files = common.walk_directory(args.input.resolve(), lambda x: is_jpeg(x))
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
     LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
