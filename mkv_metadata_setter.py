@@ -60,7 +60,9 @@ if __name__ == "__main__":
             if track.audio_bits is not None:
                 an += f' / {track.audio_bits}bits'
             if tid <= len(audio_names):
-                an += f' — {audio_names[tid - 1]}'
+                t = audio_names[tid - 1]
+                if len(t) > 0:
+                    an += f' — {t}'
             cmd += f' --edit track:a{tid} --set language={al} --set name={quote(an)}'
             tid += 1
         # Handle subtitles tracks
