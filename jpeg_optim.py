@@ -8,6 +8,7 @@ Optimize jpeg files
 from __future__ import division
 import os
 import argparse
+import multiprocessing
 from pathlib import Path
 from queue import Queue
 from shlex import quote
@@ -99,6 +100,9 @@ if __name__ == "__main__":
     LOGGER.log(f"{common.COLOR_WHITE}[+] Using {common.COLOR_BLUE}{', '.join(programs)}")
 
     # Optimize
-    t = common.parallel(th_optimize, (queue, programs, args.keep_metadata,))
+    max_threads = multiprocessing.cpu_count()
+    if args.use_guetzli is True:
+        max_threads = int(max_threads / 2)
+    t = common.parallel(fct=th_optimize, args=(queue, programs, args.keep_metadata,), max_threads=max_threads)
     bytes_saved = total_original_bytes - sum(x.stat().st_size for x in files)
     LOGGER.log(f"{common.COLOR_WHITE}[+] {common.COLOR_GREEN if bytes_saved > 0 else common.COLOR_RED}{bytes_saved} bytes saved ({bytes_saved / 1048576:4.2f}Mb) in {t:4.2f}s")
