@@ -31,7 +31,7 @@ def str2bool(value: str) -> bool:
         return False
     raise f"<{value}> can't be converted to a bool"
 
-def list_directory(path: Path, filt=None, sort=False) -> List[Path]:
+def list_directory(path: Path, filt: callable = None, sort: bool = False) -> List[Path]:
     """Returns the list of files at `path`"""
     ret: List[Path] = []
     if path.is_dir() is False:
@@ -52,7 +52,7 @@ def list_directory(path: Path, filt=None, sort=False) -> List[Path]:
     return ret if sort is False else sorted(ret)
 
 
-def walk_directory(path: Path, filt=None) -> List[Path]:
+def walk_directory(path: Path, filt: callable = None) -> List[Path]:
     """walk directory at `path`. (returns all files within subdirectories)"""
     ret: List[Path] = []
     if path.is_dir() is False:
@@ -97,11 +97,11 @@ def as_queue(lst: list) -> Queue:
         q.put(x)
     return q
 
-def parallel(fct, args: tuple) -> float:
+def parallel(fct: callable, args: tuple, max_threads: int = multiprocessing.cpu_count()) -> float:
     """Execute `fct` with `args` in parallel"""
     t_start = time.time()
     queue = args[0]
-    for i in range(multiprocessing.cpu_count()):
+    for i in range(max_threads):
         th = Thread(target=fct, args=args, name=str(i), daemon=True)
         th.start()
     queue.join()
@@ -115,7 +115,7 @@ def abort(msg: str = None):
     print(COLOR_WHITE)
     sys.exit(-1)
 
-def system_call(command: str, use_stderr=False) -> str:
+def system_call(command: str, use_stderr: bool = False) -> str:
     """Execute `command` and returns stdout or stderr depending on `use_stderr`"""
     if use_stderr is True:
         process = subprocess.Popen([command], stderr=subprocess.PIPE, shell=True)
