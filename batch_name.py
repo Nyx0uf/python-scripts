@@ -35,7 +35,7 @@ def rename(src: List[Path], pattern: str, zero: str, after: str, real=False):
                 elif good_index >= 10:
                     target_filename = f"{pattern}{good_index}"
             else:
-                target_filename = f"{pattern}{good_index}"
+                target_filename = f"{pattern}0{good_index}"
         if after is not None:
             target_filename += after
         target_filename += val.suffix
