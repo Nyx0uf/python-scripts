@@ -66,6 +66,8 @@ def match_signature(path: Path, signatures: List[bytes]) -> bool:
     def all_items_equal(lst: List) -> bool:
         """Returns True if all items in `lst` are equal"""
         return not lst or lst.count(lst[0]) == len(lst)
+    if path.is_dir():
+        return False
     if all_items_equal(list(map(len, signatures))) is True:
         with open(path, "rb") as f:
             b = f.read(len(signatures[0]))
