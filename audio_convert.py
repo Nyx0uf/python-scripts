@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     out_format = args.format.lower()
     if is_valid_output_format(out_format) is False:
-        formats = '\n- '.join(sorted(SUPPORTED_OUTPUT_TYPES.keys()))
+        formats = "\n- ".join(sorted(SUPPORTED_OUTPUT_TYPES.keys()))
         common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid format {common.COLOR_WHITE}{out_format}\n{common.COLOR_YELLOW}[+] Available formats:\n- {formats}")
 
     # Get a list of files
