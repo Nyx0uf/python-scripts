@@ -142,7 +142,7 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid samplerate {common.COLOR_WHITE}{args.samplerate}\n{common.COLOR_YELLOW}[+] Available samplerates:\n- {samplerates}")
 
     if args.bit_depth is not None and args.bit_depth not in SUPPORTED_BIT_DEPTH:
-        bds = '\n- '.join(SUPPORTED_BIT_DEPTH)
+        bds = "\n- ".join(SUPPORTED_BIT_DEPTH)
         common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid bit depth {common.COLOR_WHITE}{args.bit_depth}\n{common.COLOR_YELLOW}[+] Available bit depth:\n- {bds}")
 
     out_format = args.format.lower()
