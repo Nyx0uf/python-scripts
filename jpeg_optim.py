@@ -77,6 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--guetzli", dest="use_guetzli", action='store_true', help="Use guetzli (very slow), default: false")
     parser.add_argument("-n", "--no-jpegtran", dest="use_jpegtran", action="store_false", default=True, help="Use jpegtran, default: true")
     parser.add_argument("-m", "--keep-metadata", dest="keep_metadata", action='store_true', help="Keep metadata, default: false")
+    parser.add_argument("-t", "--threads", dest="threads", type=int, default=0, help="Number of files to process simultaneously")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
@@ -100,8 +101,8 @@ if __name__ == "__main__":
     LOGGER.log(f"{common.COLOR_WHITE}[+] Using {common.COLOR_BLUE}{', '.join(programs)}")
 
     # Optimize
-    max_threads = multiprocessing.cpu_count()
-    if args.use_guetzli is True:
+    max_threads = multiprocessing.cpu_count() if args.threads <= 0 or args.threads > multiprocessing.cpu_count() else args.threads
+    if args.use_guetzli is True and args.threads <= 0:
         max_threads = int(max_threads / 2)
     t = common.parallel(fct=th_optimize, args=(queue, programs, args.keep_metadata,), max_threads=max_threads)
     bytes_saved = total_original_bytes - sum(x.stat().st_size for x in files)
