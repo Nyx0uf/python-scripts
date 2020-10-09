@@ -31,6 +31,10 @@ def str2bool(value: str) -> bool:
         return False
     raise f"<{value}> can't be converted to a bool"
 
+def clamp(n, lo, hi):
+    """Clamp a value"""
+    return max(lo, min(n, hi))
+
 def list_directory(path: Path, filt: callable = None, sort: bool = False) -> List[Path]:
     """Returns the list of files at `path`"""
     ret: List[Path] = []
