@@ -28,6 +28,7 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--no-uppercase", dest="uppercase", action="store_false", help="Do not include uppercase letters")
     parser.add_argument("-n", "--no-numbers", dest="numbers", action="store_false", help="Do not include numbers")
     parser.add_argument("-s", "--no-symbols", dest="symbols", action="store_false", help="Do not include symbols")
+    parser.add_argument("-c", "--clipboard", dest="clipboard", action="store_true", help="Copy the generated password to the clipboard")
     args = parser.parse_args()
 
     charset = string.ascii_lowercase
@@ -41,3 +42,5 @@ if __name__ == "__main__":
     password = generate_password(charset, common.clamp(args.length, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH))
 
     print(password)
+    if args.clipboard is True:
+        common.copy_to_clipboard(password)
