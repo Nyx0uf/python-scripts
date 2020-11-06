@@ -38,6 +38,7 @@ VIDEO_EXTENSIONS: List[str] = [
     str('.mp4'),
     str('.mpg'),
     str('.mpeg'),
+    str('.mpeg2'),
     str('.vc1'),
     str('.wmv'),
 ]

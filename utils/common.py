@@ -9,6 +9,7 @@ import os
 import sys
 import subprocess
 import multiprocessing
+import platform
 import time
 from threading import Thread
 from queue import Queue
@@ -132,3 +133,12 @@ def ensure_exist(programs: List[str]):
     for p in programs:
         if which(p) is None:
             abort(f"{COLOR_RED}[!] {COLOR_WHITE}{p} {COLOR_RED}not found in $PATH")
+
+def copy_to_clipboard(data: str):
+    """Copy data to the clipboard"""
+    if platform.system() == 'Linux':
+        subprocess.run("xclip", universal_newlines=True, input=data)
+    elif platform.system() == 'Darwin':
+        subprocess.run("pbcopy", universal_newlines=True, input=data)
+    elif platform.system() == 'Windows':
+        os.system(f"echo {data}|clip")
