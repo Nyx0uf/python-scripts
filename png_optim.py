@@ -66,7 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode, default: false")
     parser.add_argument("-q", "--quant", dest="use_pngquant", action="store_true", help="Use pngquant, default: false")
     parser.add_argument("-z", "--zopfli", dest="use_zopfli", action="store_true", help="Use zopfli (very slow), default: false")
-    parser.add_argument("-n", "--no-optipng", dest="use_optipng", action="store_false", default=True, help="Use optipng, default: true")
+    parser.add_argument("-o", "--optipng", dest="use_optipng", action="store_true", default=True, help="Use optipng, default: true")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
