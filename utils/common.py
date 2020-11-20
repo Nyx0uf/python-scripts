@@ -76,21 +76,21 @@ def walk_directory(path: Path, filt: callable = None) -> List[Path]:
                 ret.append(p)
     return ret
 
-def which(program: str) -> str:
-    """Like the unix which command"""
-    def is_exe(path: str) -> bool:
-        """Check if `path` is executable"""
-        return os.path.isfile(path) and os.access(path, os.X_OK)
+def is_executable(path: Path) -> bool:
+    """Check if `path` is executable"""
+    return path.is_file() and os.access(str(path), os.X_OK)
 
-    fpath, _ = os.path.split(program)
+def which(program: Path) -> Path:
+    """Like the unix which command"""
+    fpath, _ = os.path.split(str(program))
     if fpath:
-        if is_exe(program):
+        if is_executable(program):
             return program
     else:
         for path in os.environ["PATH"].split(os.pathsep):
             path = path.strip('"')
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
+            exe_file = os.path.join(path, str(program))
+            if is_executable(exe_file):
                 return exe_file
 
     return None
