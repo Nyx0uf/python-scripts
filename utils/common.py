@@ -131,7 +131,7 @@ def system_call(command: str, use_stderr: bool = False) -> str:
 def ensure_exist(programs: List[str]):
     """Exits if one of `programs` does not exist"""
     for p in programs:
-        if which(p) is None:
+        if which(Path(p)) is None:
             abort(f"{COLOR_RED}[!] {COLOR_WHITE}{p} {COLOR_RED}not found in $PATH")
 
 def copy_to_clipboard(data: str):
