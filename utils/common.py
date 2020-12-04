@@ -78,7 +78,7 @@ def walk_directory(path: Path, filt: callable = None) -> List[Path]:
 
 def is_executable(path: Path) -> bool:
     """Check if `path` is executable"""
-    return path.is_file() and os.access(str(path), os.X_OK)
+    return Path(path).is_file() and os.access(str(path), os.X_OK)
 
 def which(program: Path) -> Path:
     """Like the unix which command"""
