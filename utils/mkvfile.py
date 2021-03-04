@@ -20,6 +20,7 @@ CODEC_VIDEO_VC1 = str("vc-1")
 # Audio codecs
 CODEC_AUDIO_AAC = str("aac")
 CODEC_AUDIO_AC3 = str("ac-3")
+CODEC_AUDIO_AC3_2 = str("ac-3 dolby surround ex")
 CODEC_AUDIO_ALAC = str("alac")
 CODEC_AUDIO_DTS = str("dts")
 CODEC_AUDIO_DTSES = str("dts-es")
@@ -55,6 +56,7 @@ CODEC_EXTENSION_MAP: Dict[str, str] = {
     # audio
     CODEC_AUDIO_AAC : str(".aac"),
     CODEC_AUDIO_AC3 : str(".ac3"),
+    CODEC_AUDIO_AC3_2 : str(".ac3"),
     CODEC_AUDIO_ALAC : str(".m4a"),
     CODEC_AUDIO_DTS : str(".dts"),
     CODEC_AUDIO_DTSES : str(".es.dts"),
@@ -80,6 +82,7 @@ CODEC_EXTENSION_MAP: Dict[str, str] = {
 CODEC_AUDIO_SCORE: Dict[str, int] = {
     CODEC_AUDIO_AAC : 5,
     CODEC_AUDIO_AC3 : 6,
+    CODEC_AUDIO_AC3_2 : 6,
     CODEC_AUDIO_ALAC : 11,
     CODEC_AUDIO_DTS : 9,
     CODEC_AUDIO_DTSES : 10,
