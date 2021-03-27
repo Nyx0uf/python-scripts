@@ -15,7 +15,9 @@ from utils import common
 CODEC_VIDEO_MPEG2 = str("mpeg-1/2")
 CODEC_VIDEO_MPEG4 = str("mpeg-4p2")
 CODEC_VIDEO_H264 = str("mpeg-4p10/avc/h.264")
+CODEC_VIDEO_H264_2 = str("avc/h.264/mpeg-4p10")
 CODEC_VIDEO_H265 = str("mpeg-h/hevc/h.265")
+CODEC_VIDEO_H265_2 = str("hevc/h.265/mpeg-h")
 CODEC_VIDEO_VC1 = str("vc-1")
 # Audio codecs
 CODEC_AUDIO_AAC = str("aac")
@@ -51,7 +53,9 @@ CODEC_EXTENSION_MAP: Dict[str, str] = {
     CODEC_VIDEO_MPEG2 : str('.mpeg2'),
     CODEC_VIDEO_MPEG4 : str('.mpeg4'),
     CODEC_VIDEO_H264 : str('.264'),
+    CODEC_VIDEO_H264_2 : str('.264'),
     CODEC_VIDEO_H265 : str('.265'),
+    CODEC_VIDEO_H265_2 : str('.265'),
     CODEC_VIDEO_VC1 : str('.vc1'),
     # audio
     CODEC_AUDIO_AAC : str(".aac"),
