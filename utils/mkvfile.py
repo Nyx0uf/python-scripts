@@ -19,6 +19,7 @@ CODEC_VIDEO_H264_2 = str("avc/h.264/mpeg-4p10")
 CODEC_VIDEO_H265 = str("mpeg-h/hevc/h.265")
 CODEC_VIDEO_H265_2 = str("hevc/h.265/mpeg-h")
 CODEC_VIDEO_VC1 = str("vc-1")
+CODEC_VIDEO_AV1 = str("av1")
 # Audio codecs
 CODEC_AUDIO_AAC = str("aac")
 CODEC_AUDIO_AC3 = str("ac-3")
@@ -57,6 +58,7 @@ CODEC_EXTENSION_MAP: Dict[str, str] = {
     CODEC_VIDEO_H265 : str('.265'),
     CODEC_VIDEO_H265_2 : str('.265'),
     CODEC_VIDEO_VC1 : str('.vc1'),
+    CODEC_VIDEO_AV1 : str('.av1'),
     # audio
     CODEC_AUDIO_AAC : str(".aac"),
     CODEC_AUDIO_AC3 : str(".ac3"),
