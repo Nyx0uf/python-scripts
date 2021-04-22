@@ -10,14 +10,15 @@ from pathlib import Path
 from utils import common
 from utils import mkvfile
 
-def check_chaptered(p_queue: Queue):
+def check_subs(p_queue: Queue):
     """check"""
     while p_queue.empty() is False:
         original_file: Path = p_queue.get()
         try:
             mkv = mkvfile.MkvFile(original_file)
-            if mkv.chaptered is False:
-                print(f"{original_file}")
+            for track in mkv.tracks:
+                if track.codec == "substationalpha":
+                    print(f"{original_file}")
         except:
             print(f"ERROR PARSING :::: {original_file}")
         p_queue.task_done()
@@ -35,4 +36,4 @@ if __name__ == "__main__":
     files = common.list_directory(args.input.resolve(), lambda x: x.suffix == ".mkv", True)
     queue = common.as_queue(files)
 
-    common.parallel(check_chaptered, (queue,))
+    common.parallel(check_subs, (queue,))
