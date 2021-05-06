@@ -137,8 +137,8 @@ def ensure_exist(programs: List[str]):
 def copy_to_clipboard(data: str):
     """Copy data to the clipboard"""
     if platform.system() == 'Linux':
-        subprocess.run("xclip", universal_newlines=True, input=data)
+        subprocess.run("xclip", universal_newlines=True, input=data, check=False)
     elif platform.system() == 'Darwin':
-        subprocess.run("pbcopy", universal_newlines=True, input=data)
+        subprocess.run("pbcopy", universal_newlines=True, input=data, check=False)
     elif platform.system() == 'Windows':
         os.system(f"echo {data}|clip")
