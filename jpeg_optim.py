@@ -9,6 +9,7 @@ from __future__ import division
 import os
 import argparse
 import multiprocessing
+import threading
 from pathlib import Path
 from queue import Queue
 from shlex import quote
@@ -26,7 +27,7 @@ def is_420_subsampled(path: Path) -> bool:
     return '2x2,1x1,1x1' in ch
 
 def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata: bool) -> str:
-    """returns the command corresponding to `filt`"""
+    """returns the command corresponding to `program`"""
     if program == O_SUBSAMPLE:
         return f"convert {quote(str(infile))} -sampling-factor '2x2,1x1,1x1' {quote(str(outfile))}"
     if program == O_GUETZLI:
@@ -42,29 +43,30 @@ def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
         last_file = infile
         for prg in programs:
             if prg == O_SUBSAMPLE and is_420_subsampled(infile) is True:
-                LOGGER.log(f"{common.COLOR_WHITE}[-] {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} is already subsampled, skipping…")
+                # Already subsampled
+                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} is already subsampled, skipping…")
                 continue
             outfile = infile.with_name(f"{infile.stem}.{prg}.jpg")
             cmd = command_for_filter(prg, last_file, outfile, keep_metadata)
             if cmd is None:
-                LOGGER.log(f"{common.COLOR_WHITE}[!] {common.COLOR_RED}ERROR: No command for {common.COLOR_YELLOW}{prg}{common.COLOR_WHITE}")
+                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[!] {common.COLOR_RED}ERROR: No command for {common.COLOR_YELLOW}{prg}{common.COLOR_WHITE}")
                 continue
-            LOGGER.log(f"{common.COLOR_WHITE}[$] {common.COLOR_PURPLE}{cmd}")
+            LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[$] {common.COLOR_PURPLE}{cmd}")
             os.system(cmd)
             if outfile.exists() is True:
                 if outfile.stat().st_size < last_file.stat().st_size:
-                    LOGGER.log(f"{common.COLOR_WHITE}[-] {common.COLOR_BLUE}{prg} {common.COLOR_GREEN}successful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
+                    LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_GREEN}successful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
                     if last_file.samefile(infile) is False:
-                        LOGGER.log(f"{common.COLOR_WHITE}[-] Removing {common.COLOR_YELLOW}{last_file}")
+                        LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] Removing {common.COLOR_YELLOW}{last_file}")
                         last_file.unlink()
                     last_file = outfile
                 else:
-                    LOGGER.log(f"{common.COLOR_WHITE}[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
+                    LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
                     outfile.unlink()
             else:
-                LOGGER.log(f"{common.COLOR_WHITE}[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
+                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
         if last_file.samefile(infile) is False:
-            LOGGER.log(f"{common.COLOR_WHITE}[-] Renaming {common.COLOR_YELLOW}{last_file}{common.COLOR_WHITE} to {common.COLOR_YELLOW}{infile}")
+            LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] Renaming {common.COLOR_YELLOW}{last_file}{common.COLOR_WHITE} to {common.COLOR_YELLOW}{infile}")
             infile.unlink()
             last_file.rename(infile)
         p_queue.task_done()
@@ -94,7 +96,7 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_WHITE}[!] {common.COLOR_RED}ERROR: No optimization programs specified or found, aborting…")
 
     # Get files list
-    files = common.list_directory(args.input.resolve(), lambda x: io.match_signature(x, [b"\xFF\xD8\xFF\xE0", b"\xFF\xD8\xFF\xE1", b"\xFF\xD8\xFF\xE2", b"\xFF\xD8\xFF\xEE", b"\xFF\xD8\xFF\xDB"]))
+    files = common.list_directory(args.input.resolve(), lambda x: io.match_signature(x, [b"\xFF\xD8\xFF\xE0", b"\xFF\xD8\xFF\xE1", b"\xFF\xD8\xFF\xE2", b"\xFF\xD8\xFF\xEE", b"\xFF\xD8\xFF\xDB"]), sort=True)
     queue = common.as_queue(files)
     total_original_bytes = sum(x.stat().st_size for x in files)
     LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to optimize ({total_original_bytes / 1048576:4.2f}Mb)")
