@@ -26,6 +26,7 @@ AUDIO_EXTENSIONS: List[str] = [
     str('.opus'),
     str('.thd'),
     str('.wav'),
+    str('webm'),
     str('.wma'),
 ]
 
