@@ -58,7 +58,7 @@ if __name__ == "__main__":
     for idx, val in enumerate(src_files):
         src_file = src_files[idx]
         dst_file = dst_files[idx]
-        sushi = 'python2 ' + MY_SUSHI_PATH + ' --window ' + args.win
+        sushi = 'python2 ' + MY_SUSHI_PATH + ' --no-grouping --window ' + args.win
         sushi += ' --src "' + src_file + '"'
         if args.srcscript is not None:
             sushi += ' --src-script ' + args.srcscript
