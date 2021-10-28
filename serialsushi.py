@@ -10,13 +10,7 @@ import argparse
 import sys
 from sys import platform as _platform
 
-MY_SUSHI_PATH = str("")
-if _platform == "linux" or _platform == "linux2":
-    MY_SUSHI_PATH = "~/scripts/Sushi/sushi.py"
-elif _platform == "darwin":
-    MY_SUSHI_PATH = "/Users/nyxouf/Documents/scripts/Sushi/sushi.py"
-else:
-    sys.exit(-10)
+MY_SUSHI_PATH = str("~/scripts/Sushi/sushi.py")
 
 def list_directory(p_path, p_sorted=False):
     """Returns the list of files at p_path"""
