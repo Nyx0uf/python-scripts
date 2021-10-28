@@ -25,7 +25,7 @@ def list_directory(p_path, p_sorted=False):
         ret.append(p_path)
     else:
         for f in os.listdir(p_path):
-            if f.startswith('.') is True:
+            if f.startswith('.') is True or f.endswith('mkv') is False:
                 continue
             p = os.path.join(p_path, f)
             ret.append(p)
