@@ -8,7 +8,6 @@ bla bla
 import os
 import argparse
 import sys
-from sys import platform as _platform
 
 MY_SUSHI_PATH = str("~/scripts/Sushi/sushi.py")
 
