@@ -30,7 +30,8 @@ if __name__ == "__main__":
     parser.add_argument("-dst", action="store", dest="dst", type=str, help="Path to directory or video file")
     parser.add_argument("-src-script", action="store", dest="srcscript", type=str, help="mkvmerge script index")
     parser.add_argument("-src-audio", action="store", dest="srcaudio", type=str, help="mkvmerge audio index")
-    parser.add_argument("-win", action="store", dest="win", type=str, default="400", help="Path to directory or video file")
+    parser.add_argument("-win", action="store", dest="win", type=str, default="100", help="Path to directory or video file")
+    parser.add_argument("-c", "--no-cleanup", dest="no_cleanup", action="store_true", help="cleanup files")
     args = parser.parse_args()
 
     # Sanity check
@@ -52,6 +53,8 @@ if __name__ == "__main__":
         src_file = src_files[idx]
         dst_file = dst_files[idx]
         sushi = 'python2 ' + MY_SUSHI_PATH + ' --no-grouping --window ' + args.win
+        if args.no_cleanup is True:
+            sushi += ' --no-cleanup '
         sushi += ' --src "' + src_file + '"'
         if args.srcscript is not None:
             sushi += ' --src-script ' + args.srcscript
