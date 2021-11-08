@@ -32,7 +32,7 @@ if __name__ == "__main__":
     if "image" in args.type:
         types.extend(["image/jpeg", "image/png"])
     if "font" in args.type:
-        types.extend(["application/x-truetype-font", "application/vnd.ms-opentype", "application/font-sfnt"])
+        types.extend(["application/x-truetype-font", "application/vnd.ms-opentype", "application/font-sfnt", "font/collection"])
 
     # Extract all attachments
     for f in files:
