@@ -46,13 +46,16 @@ VIDEO_EXTENSIONS: List[str] = [
 
 SUBTITLE_EXTENSIONS: List[str] = [
     str('.ass'),
+    str('.mks'),
     str('.pgs'),
     str('.srt'),
     str('.ssa'),
     str('.txt'),
 ]
 
+
 def get_file_infos(filepath: Path) -> str:
     """ffmpeg -i `filepath`"""
-    data = common.system_call(f"ffmpeg -hide_banner -i {quote(str(filepath))}", True).decode("utf-8")
+    data = common.system_call(
+        f"ffmpeg -hide_banner -i {quote(str(filepath))}", True).decode("utf-8")
     return data
