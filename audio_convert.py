@@ -62,13 +62,16 @@ BIT_DEPTH_MAP: Dict[str, str] = {
     str('32'): str('s32'),
 }
 
+
 def is_valid_audio_file(path: Path) -> bool:
     """Check if `path` is a supported audio file"""
     return path.suffix.lower() in av.AUDIO_EXTENSIONS
 
+
 def is_valid_output_format(fmt: str) -> bool:
     """Check if `fmt` is a supported output format"""
     return fmt in SUPPORTED_OUTPUT_TYPES
+
 
 def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
     """Convert thread"""
@@ -78,7 +81,9 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
     elif fmt == 'flac':
         ffmpeg_options += 'flac -compression_level 12'
     elif fmt == 'aac':
-        ffmpeg_options += 'libfdk_aac -vbr 5 -movflags +faststart'
+        #enc = 'aac_at' if sys.platform.lower() == "darwin" else 'libfdk_aac'
+        enc = 'libfdk_aac'
+        ffmpeg_options += f'{enc} -vbr 5 -movflags +faststart'
     elif fmt == 'mp3':
         ffmpeg_options += 'libmp3lame -q:a 0'
     elif fmt == 'ac3':
@@ -105,27 +110,38 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
         if infile.suffix == out_extension:
-            LOGGER.log(f"{common.COLOR_WHITE}[+] No conversion needed for {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE}")
+            LOGGER.log(
+                f"{common.COLOR_WHITE}[+] No conversion needed for {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE}")
             p_queue.task_done()
             continue
         outfile = infile.with_suffix(out_extension)
         cmd = f"ffmpeg -i {quote(str(infile))} {ffmpeg_options} {quote(str(outfile))}"
-        LOGGER.log(f"{common.COLOR_WHITE}[+] Converting {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} with {common.COLOR_PURPLE}{cmd}{common.COLOR_WHITE}")
+        LOGGER.log(
+            f"{common.COLOR_WHITE}[+] Converting {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} with {common.COLOR_PURPLE}{cmd}{common.COLOR_WHITE}")
         os.system(cmd)
         if delete is True:
-            LOGGER.log(f"{common.COLOR_WHITE}[+] Removing {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE}")
+            LOGGER.log(
+                f"{common.COLOR_WHITE}[+] Removing {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE}")
             infile.unlink()
         p_queue.task_done()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path, help="Path to directory or single audio file")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
-    parser.add_argument("-f", "--format", dest="format", type=str, help="Format to convert to")
-    parser.add_argument("-s", "--samplerate", dest="samplerate", type=str, help="Samplerate in Hertz (ex: 44100)")
-    parser.add_argument("-b", "--bit-depth", dest="bit_depth", type=str, help="Bit depth between 8, 16, 24, 32")
-    parser.add_argument("-e", "--extension", dest="extension", type=str, help="Overwrite default output file extension (ex: for aac, .aac instead of .m4a)")
-    parser.add_argument("-d", "--delete", dest="delete", action="store_true", help="Delete original file after conversion")
+    parser.add_argument("input", type=Path,
+                        help="Path to directory or single audio file")
+    parser.add_argument("-v", "--verbose", dest="verbose",
+                        action="store_true", help="Verbose mode")
+    parser.add_argument("-f", "--format", dest="format",
+                        type=str, help="Format to convert to")
+    parser.add_argument("-s", "--samplerate", dest="samplerate",
+                        type=str, help="Samplerate in Hertz (ex: 44100)")
+    parser.add_argument("-b", "--bit-depth", dest="bit_depth",
+                        type=str, help="Bit depth between 8, 16, 24, 32")
+    parser.add_argument("-e", "--extension", dest="extension", type=str,
+                        help="Overwrite default output file extension (ex: for aac, .aac instead of .m4a)")
+    parser.add_argument("-d", "--delete", dest="delete",
+                        action="store_true", help="Delete original file after conversion")
     args = parser.parse_args()
     LOGGER = logger.Logger(args.verbose)
 
@@ -139,20 +155,24 @@ if __name__ == "__main__":
 
     if args.samplerate is not None and args.samplerate not in SUPPORTED_SAMPLERATES:
         samplerates = '\n- '.join(SUPPORTED_SAMPLERATES)
-        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid samplerate {common.COLOR_WHITE}{args.samplerate}\n{common.COLOR_YELLOW}[+] Available samplerates:\n- {samplerates}")
+        common.abort(
+            f"{common.COLOR_RED}[!] ERROR: Invalid samplerate {common.COLOR_WHITE}{args.samplerate}\n{common.COLOR_YELLOW}[+] Available samplerates:\n- {samplerates}")
 
     if args.bit_depth is not None and args.bit_depth not in SUPPORTED_BIT_DEPTH:
         bds = "\n- ".join(SUPPORTED_BIT_DEPTH)
-        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid bit depth {common.COLOR_WHITE}{args.bit_depth}\n{common.COLOR_YELLOW}[+] Available bit depth:\n- {bds}")
+        common.abort(
+            f"{common.COLOR_RED}[!] ERROR: Invalid bit depth {common.COLOR_WHITE}{args.bit_depth}\n{common.COLOR_YELLOW}[+] Available bit depth:\n- {bds}")
 
     out_format = args.format.lower()
     if is_valid_output_format(out_format) is False:
         formats = "\n- ".join(sorted(SUPPORTED_OUTPUT_TYPES.keys()))
-        common.abort(f"{common.COLOR_RED}[!] ERROR: Invalid format {common.COLOR_WHITE}{out_format}\n{common.COLOR_YELLOW}[+] Available formats:\n- {formats}")
+        common.abort(
+            f"{common.COLOR_RED}[!] ERROR: Invalid format {common.COLOR_WHITE}{out_format}\n{common.COLOR_YELLOW}[+] Available formats:\n- {formats}")
 
     # Get a list of files
     files = common.walk_directory(args.input.resolve(), is_valid_audio_file)
     queue = common.as_queue(files)
 
     # Convert
-    common.parallel(convert, (queue, out_format, args.samplerate, args.bit_depth, args.extension, args.delete,))
+    common.parallel(convert, (queue, out_format, args.samplerate,
+                    args.bit_depth, args.extension, args.delete,))
