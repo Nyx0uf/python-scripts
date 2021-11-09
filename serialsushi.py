@@ -8,15 +8,8 @@ bla bla
 import os
 import argparse
 import sys
-from sys import platform as _platform
 
-MY_SUSHI_PATH = str("")
-if _platform == "linux" or _platform == "linux2":
-    MY_SUSHI_PATH = "~/scripts/Sushi/sushi.py"
-elif _platform == "darwin":
-    MY_SUSHI_PATH = "/Users/nyxouf/Documents/scripts/Sushi/sushi.py"
-else:
-    sys.exit(-10)
+MY_SUSHI_PATH = str("~/scripts/Sushi/sushi.py")
 
 def list_directory(p_path, p_sorted=False):
     """Returns the list of files at p_path"""
@@ -25,7 +18,7 @@ def list_directory(p_path, p_sorted=False):
         ret.append(p_path)
     else:
         for f in os.listdir(p_path):
-            if f.startswith('.') is True:
+            if f.startswith('.') is True or f.endswith('mkv') is False:
                 continue
             p = os.path.join(p_path, f)
             ret.append(p)
@@ -58,7 +51,7 @@ if __name__ == "__main__":
     for idx, val in enumerate(src_files):
         src_file = src_files[idx]
         dst_file = dst_files[idx]
-        sushi = 'python2 ' + MY_SUSHI_PATH + ' --window ' + args.win
+        sushi = 'python2 ' + MY_SUSHI_PATH + ' --no-grouping --window ' + args.win
         sushi += ' --src "' + src_file + '"'
         if args.srcscript is not None:
             sushi += ' --src-script ' + args.srcscript
