@@ -41,80 +41,86 @@ CODEC_AUDIO_VORBIS = str("vorbis")
 CODEC_AUDIO_WAVPACK4 = str("wavpack4")
 # Subtitles codecs
 CODEC_SUBTITLE_ASS = str("substationalpha")
+CODEC_SUBTITLE_MKS = str("substationalpha")
 CODEC_SUBTITLE_PGS = str("hdmv pgs")
 CODEC_SUBTITLE_SRT = str("subrip/srt")
 CODEC_SUBTITLE_VOBSUB = str("vobsub")
 SUBTITLE_TYPE_ASS = str("ass")
+SUBTITLE_TYPE_MKS = str("mks")
 SUBTITLE_TYPE_PGS = str("pgs")
 SUBTITLE_TYPE_SRT = str("srt")
 SUBTITLE_TYPE_VOBSUB = str("vobsub")
 
 CODEC_EXTENSION_MAP: Dict[str, str] = {
     # video
-    CODEC_VIDEO_MPEG2 : str('.mpeg2'),
-    CODEC_VIDEO_MPEG4 : str('.mpeg4'),
-    CODEC_VIDEO_H264 : str('.264'),
-    CODEC_VIDEO_H264_2 : str('.264'),
-    CODEC_VIDEO_H265 : str('.265'),
-    CODEC_VIDEO_H265_2 : str('.265'),
-    CODEC_VIDEO_VC1 : str('.vc1'),
-    CODEC_VIDEO_AV1 : str('.av1'),
+    CODEC_VIDEO_MPEG2: str('.mpeg2'),
+    CODEC_VIDEO_MPEG4: str('.mpeg4'),
+    CODEC_VIDEO_H264: str('.264'),
+    CODEC_VIDEO_H264_2: str('.264'),
+    CODEC_VIDEO_H265: str('.265'),
+    CODEC_VIDEO_H265_2: str('.265'),
+    CODEC_VIDEO_VC1: str('.vc1'),
+    CODEC_VIDEO_AV1: str('.av1'),
     # audio
-    CODEC_AUDIO_AAC : str(".aac"),
-    CODEC_AUDIO_AC3 : str(".ac3"),
-    CODEC_AUDIO_AC3_2 : str(".ac3"),
-    CODEC_AUDIO_ALAC : str(".m4a"),
-    CODEC_AUDIO_DTS : str(".dts"),
-    CODEC_AUDIO_DTSES : str(".es.dts"),
-    CODEC_AUDIO_DTSHDMA : str(".hdma.dts"),
-    CODEC_AUDIO_DTSHRA : str(".hra.dts"),
-    CODEC_AUDIO_EAC3 : str(".eac3"),
-    CODEC_AUDIO_FLAC : str(".flac"),
-    CODEC_AUDIO_MP2 : str(".mp2"),
-    CODEC_AUDIO_MP3 : str(".mp3"),
-    CODEC_AUDIO_OPUS : str(".opus"),
-    CODEC_AUDIO_PCM : str(".wav"),
-    CODEC_AUDIO_TRUEHD : str(".thd"),
-    CODEC_AUDIO_TRUEHDATMOS : str(".thd"),
-    CODEC_AUDIO_VORBIS : str(".ogg"),
-    CODEC_AUDIO_WAVPACK4 : str(".wav"),
+    CODEC_AUDIO_AAC: str(".aac"),
+    CODEC_AUDIO_AC3: str(".ac3"),
+    CODEC_AUDIO_AC3_2: str(".ac3"),
+    CODEC_AUDIO_ALAC: str(".m4a"),
+    CODEC_AUDIO_DTS: str(".dts"),
+    CODEC_AUDIO_DTSES: str(".es.dts"),
+    CODEC_AUDIO_DTSHDMA: str(".hdma.dts"),
+    CODEC_AUDIO_DTSHRA: str(".hra.dts"),
+    CODEC_AUDIO_EAC3: str(".eac3"),
+    CODEC_AUDIO_FLAC: str(".flac"),
+    CODEC_AUDIO_MP2: str(".mp2"),
+    CODEC_AUDIO_MP3: str(".mp3"),
+    CODEC_AUDIO_OPUS: str(".opus"),
+    CODEC_AUDIO_PCM: str(".wav"),
+    CODEC_AUDIO_TRUEHD: str(".thd"),
+    CODEC_AUDIO_TRUEHDATMOS: str(".thd"),
+    CODEC_AUDIO_VORBIS: str(".ogg"),
+    CODEC_AUDIO_WAVPACK4: str(".wav"),
     # subtitles
-    CODEC_SUBTITLE_ASS : str('.ass'),
-    CODEC_SUBTITLE_PGS : str('.sup'),
-    CODEC_SUBTITLE_SRT : str('.srt'),
-    CODEC_SUBTITLE_VOBSUB : str('.vobsub')
+    CODEC_SUBTITLE_ASS: str('.ass'),
+    CODEC_SUBTITLE_MKS: str('.mks'),
+    CODEC_SUBTITLE_PGS: str('.sup'),
+    CODEC_SUBTITLE_SRT: str('.srt'),
+    CODEC_SUBTITLE_VOBSUB: str('.vobsub')
 }
 
 CODEC_AUDIO_SCORE: Dict[str, int] = {
-    CODEC_AUDIO_AAC : 5,
-    CODEC_AUDIO_AC3 : 6,
-    CODEC_AUDIO_AC3_2 : 6,
-    CODEC_AUDIO_ALAC : 11,
-    CODEC_AUDIO_DTS : 9,
-    CODEC_AUDIO_DTSES : 10,
-    CODEC_AUDIO_DTSHDMA : 14,
-    CODEC_AUDIO_DTSHRA : 13,
-    CODEC_AUDIO_EAC3 : 7,
-    CODEC_AUDIO_FLAC : 12,
-    CODEC_AUDIO_MP2 : 1,
-    CODEC_AUDIO_MP3 : 2,
-    CODEC_AUDIO_OPUS : 4,
-    CODEC_AUDIO_PCM : 8,
-    CODEC_AUDIO_TRUEHD : 15,
-    CODEC_AUDIO_TRUEHDATMOS : 16,
-    CODEC_AUDIO_VORBIS : 3,
-    CODEC_AUDIO_WAVPACK4 : 3,
+    CODEC_AUDIO_AAC: 5,
+    CODEC_AUDIO_AC3: 6,
+    CODEC_AUDIO_AC3_2: 6,
+    CODEC_AUDIO_ALAC: 11,
+    CODEC_AUDIO_DTS: 9,
+    CODEC_AUDIO_DTSES: 10,
+    CODEC_AUDIO_DTSHDMA: 14,
+    CODEC_AUDIO_DTSHRA: 13,
+    CODEC_AUDIO_EAC3: 7,
+    CODEC_AUDIO_FLAC: 12,
+    CODEC_AUDIO_MP2: 1,
+    CODEC_AUDIO_MP3: 2,
+    CODEC_AUDIO_OPUS: 4,
+    CODEC_AUDIO_PCM: 8,
+    CODEC_AUDIO_TRUEHD: 15,
+    CODEC_AUDIO_TRUEHDATMOS: 16,
+    CODEC_AUDIO_VORBIS: 3,
+    CODEC_AUDIO_WAVPACK4: 3,
 }
 
 CODEC_SUBTITLE_TYPE_MAP: Dict[str, str] = {
-    SUBTITLE_TYPE_ASS : CODEC_SUBTITLE_ASS,
-    SUBTITLE_TYPE_PGS : CODEC_SUBTITLE_PGS,
-    SUBTITLE_TYPE_SRT : CODEC_SUBTITLE_SRT,
-    SUBTITLE_TYPE_VOBSUB : CODEC_SUBTITLE_VOBSUB
+    SUBTITLE_TYPE_ASS: CODEC_SUBTITLE_ASS,
+    SUBTITLE_TYPE_MKS: CODEC_SUBTITLE_MKS,
+    SUBTITLE_TYPE_PGS: CODEC_SUBTITLE_PGS,
+    SUBTITLE_TYPE_SRT: CODEC_SUBTITLE_SRT,
+    SUBTITLE_TYPE_VOBSUB: CODEC_SUBTITLE_VOBSUB
 }
+
 
 class MkvTrack:
     """Represents a track within a mkv file"""
+
     def __init__(self, json_data):
         self.id = int(json_data["id"])
         self.type = str(json_data["type"].lower())
@@ -124,7 +130,8 @@ class MkvTrack:
         properties = json_data["properties"]
         if properties is not None:
             self.uid = int(properties["uid"])
-            self.name = str(properties["track_name"]) if "track_name" in properties else ""
+            self.name = str(properties["track_name"]
+                            ) if "track_name" in properties else ""
             self.forced = bool(properties["forced_track"])
             if self.forced is False and "forced" in self.name.lower():
                 self.forced = bool(True)
@@ -159,8 +166,10 @@ class MkvTrack:
         score += CODEC_AUDIO_SCORE[self.codec]
         return score
 
+
 class MkvAttachment:
     """Represents an attachment within a mkv file"""
+
     def __init__(self, json_data: str):
         self.id = int(json_data["id"])
         self.uid = int(json_data["properties"]["uid"])
@@ -179,8 +188,10 @@ class MkvAttachment:
     def __eq__(self, other):
         return self.id == other.id and self.uid == other.uid
 
+
 class MkvFile:
     """Represents a mkv file"""
+
     def __init__(self, path: Path):
         self.is_valid = False
         self.chaptered = False
@@ -190,7 +201,8 @@ class MkvFile:
             self.path = path
             self.is_valid = True
             infos = MkvFile.get_file_infos(path)
-            self.chaptered = bool(infos["chapters"] is not None and infos["chapters"])
+            self.chaptered = bool(
+                infos["chapters"] is not None and infos["chapters"])
             self.file_name = str(infos["file_name"])
 
             # Tracks
