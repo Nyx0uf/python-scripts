@@ -46,7 +46,6 @@ VIDEO_EXTENSIONS: List[str] = [
 
 SUBTITLE_EXTENSIONS: List[str] = [
     str('.ass'),
-    str('.mks'),
     str('.pgs'),
     str('.srt'),
     str('.ssa'),
