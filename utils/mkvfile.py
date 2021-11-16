@@ -41,12 +41,10 @@ CODEC_AUDIO_VORBIS = str("vorbis")
 CODEC_AUDIO_WAVPACK4 = str("wavpack4")
 # Subtitles codecs
 CODEC_SUBTITLE_ASS = str("substationalpha")
-CODEC_SUBTITLE_MKS = str("substationalpha")
 CODEC_SUBTITLE_PGS = str("hdmv pgs")
 CODEC_SUBTITLE_SRT = str("subrip/srt")
 CODEC_SUBTITLE_VOBSUB = str("vobsub")
 SUBTITLE_TYPE_ASS = str("ass")
-SUBTITLE_TYPE_MKS = str("mks")
 SUBTITLE_TYPE_PGS = str("pgs")
 SUBTITLE_TYPE_SRT = str("srt")
 SUBTITLE_TYPE_VOBSUB = str("vobsub")
@@ -82,7 +80,6 @@ CODEC_EXTENSION_MAP: Dict[str, str] = {
     CODEC_AUDIO_WAVPACK4: str(".wav"),
     # subtitles
     CODEC_SUBTITLE_ASS: str('.ass'),
-    CODEC_SUBTITLE_MKS: str('.mks'),
     CODEC_SUBTITLE_PGS: str('.sup'),
     CODEC_SUBTITLE_SRT: str('.srt'),
     CODEC_SUBTITLE_VOBSUB: str('.vobsub')
@@ -111,7 +108,6 @@ CODEC_AUDIO_SCORE: Dict[str, int] = {
 
 CODEC_SUBTITLE_TYPE_MAP: Dict[str, str] = {
     SUBTITLE_TYPE_ASS: CODEC_SUBTITLE_ASS,
-    SUBTITLE_TYPE_MKS: CODEC_SUBTITLE_MKS,
     SUBTITLE_TYPE_PGS: CODEC_SUBTITLE_PGS,
     SUBTITLE_TYPE_SRT: CODEC_SUBTITLE_SRT,
     SUBTITLE_TYPE_VOBSUB: CODEC_SUBTITLE_VOBSUB
