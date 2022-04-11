@@ -19,7 +19,7 @@ LOGGER: logger.Logger
 
 def is_valid_audio_file(path: Path) -> bool:
     """Check if `path` is a supported audio file"""
-    return path.suffix.lower() in [str('.flac')]
+    return path.suffix.lower() in [str('.flac'), str('.wav')]
 
 
 def convert(p_queue: Queue, delete_orig: bool):
