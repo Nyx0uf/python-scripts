@@ -24,7 +24,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     bridge = Bridge(args.ip)
-
     lights = list(filter(lambda x: x.name in LIGHTS_TO_WATCH, bridge.lights))
     if len(lights) == 0:
         sys.exit(0)
