@@ -15,7 +15,7 @@ from shlex import quote
 from typing import List
 from utils import av, common
 
-def merge_subs(audios: List[Path], vids: List[Path], lang: str, name: str, delete: bool):
+def merge_audios(audios: List[Path], vids: List[Path], lang: str, name: str, delete: bool):
     """Merge `audios` into `vids` as a .mkv file, assuming `audios` and `vids` are the exact same length"""
     for idx, _ in enumerate(audios):
         audio = audios[idx]
@@ -23,6 +23,19 @@ def merge_subs(audios: List[Path], vids: List[Path], lang: str, name: str, delet
         outfile = vid.with_name(str(vid.stem) + ".2.mkv")
         mkvmerge = f'mkvmerge -o {quote(str(outfile))} {quote(str(vid))} --language 0:{lang} --track-name 0:{quote(name)} {quote(str(audio))}'
         os.system(mkvmerge)
+        if delete is True:
+            audio.unlink()
+            vid.unlink()
+            outfile.rename(vid)
+
+def merge2(audios: List[Path], vids: List[Path], delete: bool):
+    """Merge `audios` and `vids` in a single mp4 file"""
+    for idx, _ in enumerate(audios):
+        audio = audios[idx]
+        vid = vids[idx]
+        outfile = vid.with_name(str(vid.stem) + ".2.mp4")
+        ffmpeg = f'ffmpeg -i {quote(str(vid))} -i {quote(str(audio))} -c:v copy -c:a copy {quote(str(outfile))}'
+        os.system(ffmpeg)
         if delete is True:
             audio.unlink()
             vid.unlink()
@@ -53,4 +66,5 @@ if __name__ == "__main__":
         common.abort(f"{common.COLOR_RED}[!] ERROR: Number of files mismatch, audio={len(audio_files)} video={len(video_files)}{common.COLOR_WHITE}")
 
     # Merge
-    merge_subs(audio_files, video_files, args.audio_lang, args.audio_name, args.delete)
+    merge_audios(audio_files, video_files, args.audio_lang, args.audio_name, args.delete)
+    #merge2(audio_files, video_files, args.delete)
