@@ -31,7 +31,7 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
     if program == O_SUBSAMPLE:
         return f"convert {quote(str(infile))} -sampling-factor '2x2,1x1,1x1' {quote(str(outfile))}"
     if program == O_GUETZLI:
-        return f"guetzli --quality 84 {quote(str(infile))} {quote(str(outfile))}"
+        return f"guetzli --quality 84 --nomemlimit {'--keep-exif' if keep_metadata is True else ''} {quote(str(infile))} {quote(str(outfile))}"
     if program == O_JPEGTRAN:
         return f"jpegtran -optimize -copy {'all' if keep_metadata is True else 'none'} -progressive -outfile {quote(str(outfile))} {quote(str(infile))}"
     return None
@@ -39,36 +39,41 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
 def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
     """Optimization thread"""
     while p_queue.empty() is False:
-        infile: Path = p_queue.get()
-        last_file = infile
+        original_file: Path = p_queue.get()
+        last_processed_file = original_file
         for prg in programs:
-            if prg == O_SUBSAMPLE and is_420_subsampled(infile) is True:
-                # Already subsampled
-                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_YELLOW}{infile}{common.COLOR_WHITE} is already subsampled, skipping…")
+            if prg == O_SUBSAMPLE and is_420_subsampled(original_file) is True:
+                # Already subsampled, skip to next filter
+                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_YELLOW}{original_file}{common.COLOR_WHITE} is already subsampled, skipping…")
                 continue
-            outfile = infile.with_name(f"{infile.stem}.{prg}.jpg")
-            cmd = command_for_filter(prg, last_file, outfile, keep_metadata)
+
+            outfile = original_file.with_name(f"{original_file.stem}.{prg}.jpg")
+            cmd = command_for_filter(prg, last_processed_file, outfile, keep_metadata)
             if cmd is None:
                 LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[!] {common.COLOR_RED}ERROR: No command for {common.COLOR_YELLOW}{prg}{common.COLOR_WHITE}")
                 continue
             LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[$] {common.COLOR_PURPLE}{cmd}")
             os.system(cmd)
             if outfile.exists() is True:
-                if outfile.stat().st_size < last_file.stat().st_size:
-                    LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_GREEN}successful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
-                    if last_file.samefile(infile) is False:
-                        LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] Removing {common.COLOR_YELLOW}{last_file}")
-                        last_file.unlink()
-                    last_file = outfile
+                if outfile.stat().st_size < last_processed_file.stat().st_size:
+                    LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_GREEN}successful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_processed_file}")
+                    if last_processed_file.samefile(original_file) is False:
+                        LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] Removing {common.COLOR_YELLOW}{last_processed_file}")
+                        last_processed_file.unlink()
+                    last_processed_file = outfile
                 else:
-                    LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
-                    outfile.unlink()
+                    # new file is same size or bigger than previous
+                    if prg == O_SUBSAMPLE:
+                        last_processed_file = outfile
+                    else:
+                        LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_processed_file}")
+                        outfile.unlink()
             else:
-                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_file}")
-        if last_file.samefile(infile) is False:
-            LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] Renaming {common.COLOR_YELLOW}{last_file}{common.COLOR_WHITE} to {common.COLOR_YELLOW}{infile}")
-            infile.unlink()
-            last_file.rename(infile)
+                LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_BLUE}{prg} {common.COLOR_RED}unsuccessful{common.COLOR_WHITE} for {common.COLOR_YELLOW}{last_processed_file}")
+        if last_processed_file.samefile(original_file) is False:
+            LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] Renaming {common.COLOR_YELLOW}{last_processed_file}{common.COLOR_WHITE} to {common.COLOR_YELLOW}{original_file}")
+            original_file.unlink()
+            last_processed_file.rename(original_file)
         p_queue.task_done()
 
 if __name__ == "__main__":
