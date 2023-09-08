@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List
 from utils import common
 
-def make_chapters_metadata(files: List[Path], input_dir: Path):
+def create_chapters_file(files: List[Path], input_dir: Path):
     """Create chapters file in ffmpeg metadata format"""
     chapters = {}
     chap_number = 1
@@ -34,8 +34,7 @@ def make_chapters_metadata(files: List[Path], input_dir: Path):
     last_chapter = f"{len(chapters):04d}"
     chapters[last_chapter]["end"] = chapters[last_chapter]["start"] + chapters[last_chapter]["duration"]
 
-    metadatafile = f"{quote(str(input_dir))}/ffmpeg_metadata.txt"
-    with open(metadatafile, "w+", encoding="utf-8") as m:
+    with open("ffmpeg_metadata.txt", "w+", encoding="utf-8") as m:
         m.writelines(";FFMETADATA1\n")
         for chapter in chapters:
             ch_meta = """
@@ -50,19 +49,30 @@ title={}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
+    parser.add_argument("-m", "--merge", dest="merge", action="store_true", help="Merge all videos file into a single chaptered one")
+    parser.add_argument("-format", action="store", dest="format", type=str, default="mkv", help="Output file format (between mkv, mp4)")
     args = parser.parse_args()
 
+    # Sanity checks
+    common.ensure_exist(["ffmpeg"])
+    if args.input.exists() is False:
+        common.abort(parser.format_help())
+
+    os.chdir(args.input)
+
     # list vids
-    video_files = common.list_directory(args.input, lambda x: x.suffix in (".mkv", ".mp4"), True)
+    video_files = common.list_directory(Path("."), lambda x: x.suffix in (".mkv", ".mp4"), True)
 
     # Make the list of videos in ffmpeg format
-    vlname = Path(args.input / "videos_list.txt")
+    vlname = Path("videos_list.txt")
     if vlname.exists():
         vlname.unlink()
     for filename in video_files:
         with open(vlname, mode="a", encoding="utf-8") as f:
             f.write(f"file '{filename}'\n")
 
-    make_chapters_metadata(video_files, args.input)
-    ffmpeg = f"ffmpeg -y -f concat -i {quote(str(vlname))} -i {quote(str(args.input / 'ffmpeg_metadata.txt'))} -map_metadata 1 -c copy a.mkv"
-    os.system(ffmpeg)
+    create_chapters_file(video_files, args.input)
+
+    if args.merge is True:
+        ffmpeg_cmd = f"ffmpeg -y -f concat -i {quote(str(vlname))} -i 'ffmpeg_metadata.txt' -map_metadata 1 -c copy merged.{args.format}"
+        os.system(ffmpeg_cmd)
