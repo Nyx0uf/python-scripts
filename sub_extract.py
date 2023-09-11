@@ -20,6 +20,7 @@ LOGGER: logger.Logger
 
 SubtitlesStreamInfo = namedtuple('SubtitlesStreamInfo', ['id', 'infos', 'extension', 'title'])
 
+
 def get_subs_streams(infos: str) -> str:
     """Parse `ffmpeg -i` output to grab only subtitles streams"""
     maps = {
@@ -36,6 +37,7 @@ def get_subs_streams(infos: str) -> str:
     streams = re.findall(r'Stream #0:(\d+).*?Subtitle:\s*((\w*)\s*?.*?)\r?\n(?:\s*Metadata:\s*\r?\n\s*title\s*:\s*(.*?)\r?\n)?', infos)
     return [SubtitlesStreamInfo(int(x[0]), x[1].strip(), sanitize_type(x[2].replace(",", "").strip()), x[3].strip()) for x in streams]
 
+
 def extract_subtitles(p_queue: Queue):
     """Extract thread"""
     while p_queue.empty() is False:
@@ -48,6 +50,7 @@ def extract_subtitles(p_queue: Queue):
             LOGGER.log(f"{common.COLOR_WHITE}[+] Extracting track {sub_stream.id} from {common.COLOR_YELLOW}{infile} with {common.COLOR_PURPLE}{cmd}{common.COLOR_WHITE}")
             os.system(cmd)
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

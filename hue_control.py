@@ -41,8 +41,9 @@ import time
 from threading import Thread
 from pathlib import Path
 from typing import List, Tuple
-from phue import Bridge # pip3 install phue
+from phue import Bridge  # pip3 install phue
 from utils import common
+
 
 class HueLampConfig:
     """Represents a lamp with its cfg and light object"""
@@ -67,6 +68,7 @@ class HueLampConfig:
     def __eq__(self, other):
         return self.name == other.name
 
+
 def is_valid_ipv4_address(address: str) -> bool:
     """Check if address is a valid ip / hostname"""
     try:
@@ -81,6 +83,7 @@ def is_valid_ipv4_address(address: str) -> bool:
         return False
 
     return True
+
 
 def rgb_to_xy(red: float, green: float, blue: float) -> List[float]:
     """
@@ -97,7 +100,7 @@ def rgb_to_xy(red: float, green: float, blue: float) -> List[float]:
     # gamma correction
     red = pow((red + 0.055) / (1.0 + 0.055), 2.4) if red > 0.04045 else (red / 12.92)
     green = pow((green + 0.055) / (1.0 + 0.055), 2.4) if green > 0.04045 else (green / 12.92)
-    blue =  pow((blue + 0.055) / (1.0 + 0.055), 2.4) if blue > 0.04045 else (blue / 12.92)
+    blue = pow((blue + 0.055) / (1.0 + 0.055), 2.4) if blue > 0.04045 else (blue / 12.92)
 
     # convert rgb to xyz
     x = red * 0.649926 + green * 0.103455 + blue * 0.197109
@@ -110,12 +113,14 @@ def rgb_to_xy(red: float, green: float, blue: float) -> List[float]:
 
     return [x, y]
 
+
 def random_rgb() -> Tuple[float, float, float]:
     """Returns a random RGB tuple, range 0.0—1.0"""
     r = random.random()
     g = random.random()
     b = random.random()
-    return (r, g ,b)
+    return r, g, b
+
 
 def load_cfg(path: Path):
     """Open and load the configuration file (json)"""
@@ -124,6 +129,7 @@ def load_cfg(path: Path):
             return json.loads(f.read())
     else:
         raise IOError(f"[!] {path} not found")
+
 
 def th(lamp: HueLampConfig):
     """Thread"""
@@ -146,6 +152,7 @@ def th(lamp: HueLampConfig):
                     lamp.light.on = False
                 lamp.managed = False
         time.sleep(lamp.interval)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -171,9 +178,9 @@ if __name__ == "__main__":
     lamps: List[HueLampConfig] = list(map(HueLampConfig, cfg["lamps"]))
     lights = bridge.lights
     for lamp in lamps:
-        l = list(filter(lambda x: x.name == lamp.name, lights))
-        if len(l) > 0:
-            lamp.light = l[0]
+        lit = list(filter(lambda x: x.name == lamp.name, lights))
+        if len(lit) > 0:
+            lamp.light = lit[0]
 
     thread_to_join = None
     for lamp in lamps:

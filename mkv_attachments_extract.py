@@ -15,10 +15,12 @@ from typing import List
 from utils import common
 from utils import mkvfile
 
+
 def extract_attachment(path: Path, attachment: mkvfile.MkvAttachment):
     """Extractor function"""
     cmd = f"mkvextract attachments {quote(str(path))} {attachment.id}:{quote(attachment.file_name.lower())}"
     os.system(cmd)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

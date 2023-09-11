@@ -23,7 +23,7 @@ if __name__ == "__main__":
     io.cd(TMP_PATH)
     io.rm2([BACKUP_DIR, BACKUP_NAME])
 
-    ## Backup ~ ##
+    # Backup ~
     # .config
     io.mkdir(BACKUP_HOME_CONFIG_PATH)
     io.cp_file(f"{USER_HOME_CONFIG_PATH}/katerc", BACKUP_HOME_CONFIG_PATH)

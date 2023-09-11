@@ -13,6 +13,7 @@ from shlex import quote
 from utils import common
 from utils import mkvfile
 
+
 def fix_attachment(mkv: Path, attachment: mkvfile.MkvAttachment):
     """Fix mime types"""
     mime = None
@@ -24,6 +25,7 @@ def fix_attachment(mkv: Path, attachment: mkvfile.MkvAttachment):
     if mime is not None:
         cmd = f'mkvpropedit {quote(str(mkv))} --attachment-mime-type {mime} --update-attachment {attachment.id}'
         os.system(cmd)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -20,10 +20,12 @@ LOGGER: logger.Logger
 
 AudioStreamInfo = namedtuple('AudioStreamInfo', ['id', 'infos', 'title'])
 
+
 def get_audio_streams(infos: str):
     """Parse `ffmpeg -i` output to grab only audio streams"""
     z = re.findall(r'Stream\s\#0:(\d+).*?Audio:\s*(.*?(?:\((default)\))?)\s*?(?:\(forced\))?\r?\n(?:\s*Metadata:\s*\r?\n\s*title\s*:\s*(.*?)\r?\n)?', infos)
     return [AudioStreamInfo(int(x[0]), x[1].strip(), x[2]) for x in z]
+
 
 def extension_for_audio_info(audio_type: str) -> str:
     """Returns the extension for a given audio info from `ffmpeg -i`"""
@@ -43,6 +45,7 @@ def extension_for_audio_info(audio_type: str) -> str:
         return maps[x] if x in maps else x
     return sanitize_type(audio_type[:4].strip().replace(",", "").lower())
 
+
 def extract_audio(p_queue: Queue):
     """Extract thread"""
     while p_queue.empty() is False:
@@ -55,6 +58,7 @@ def extract_audio(p_queue: Queue):
             LOGGER.log(f"{common.COLOR_WHITE}[+] Extracting track {audio_stream.id} from {common.COLOR_YELLOW}{infile} with {common.COLOR_PURPLE}{cmd}{common.COLOR_WHITE}")
             os.system(cmd)
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

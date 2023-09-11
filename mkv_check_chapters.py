@@ -10,6 +10,7 @@ from pathlib import Path
 from utils import common
 from utils import mkvfile
 
+
 def check_chaptered(p_queue: Queue):
     """check"""
     while p_queue.empty() is False:
@@ -21,6 +22,7 @@ def check_chaptered(p_queue: Queue):
         except:
             print(f"ERROR PARSING :::: {original_file}")
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

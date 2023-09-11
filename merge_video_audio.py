@@ -15,6 +15,7 @@ from shlex import quote
 from typing import List
 from utils import av, common
 
+
 def merge_audios(audios: List[Path], vids: List[Path], lang: str, name: str, delete: bool):
     """Merge `audios` into `vids` as a .mkv file, assuming `audios` and `vids` are the exact same length"""
     for idx, _ in enumerate(audios):
@@ -28,6 +29,7 @@ def merge_audios(audios: List[Path], vids: List[Path], lang: str, name: str, del
             vid.unlink()
             outfile.rename(vid)
 
+
 def merge2(audios: List[Path], vids: List[Path], delete: bool):
     """Merge `audios` and `vids` in a single mp4 file"""
     for idx, _ in enumerate(audios):
@@ -40,6 +42,7 @@ def merge2(audios: List[Path], vids: List[Path], delete: bool):
             audio.unlink()
             vid.unlink()
             outfile.rename(vid)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -67,4 +70,4 @@ if __name__ == "__main__":
 
     # Merge
     merge_audios(audio_files, video_files, args.audio_lang, args.audio_name, args.delete)
-    #merge2(audio_files, video_files, args.delete)
+    # merge2(audio_files, video_files, args.delete)

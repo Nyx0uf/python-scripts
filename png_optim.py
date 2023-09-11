@@ -19,6 +19,7 @@ F_OPTIPNG = str("optipng")
 F_PNGQUANT = str("pngquant")
 F_ZOPFLI = str("zopfli")
 
+
 def command_for_filter(program: str, infile: Path, outfile: Path) -> str:
     """returns the command corresponding to `filt`"""
     if program == F_PNGQUANT:
@@ -28,6 +29,7 @@ def command_for_filter(program: str, infile: Path, outfile: Path) -> str:
     if program == F_OPTIPNG:
         return f"optipng -quiet -o7 -preserve -out {quote(str(outfile))} {quote(str(infile))}"
     return None
+
 
 def th_optimize(p_queue: Queue, programs: List[str]):
     """Optimization thread"""
@@ -59,6 +61,7 @@ def th_optimize(p_queue: Queue, programs: List[str]):
             infile.unlink()
             last_file.rename(infile)
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
