@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # coding: utf-8
 
 """
@@ -8,8 +8,6 @@ bla bla
 import os
 import argparse
 import sys
-
-MY_SUSHI_PATH = str("~/scripts/Sushi/sushi.py")
 
 def list_directory(p_path, p_sorted=False):
     """Returns the list of files at p_path"""
@@ -52,7 +50,7 @@ if __name__ == "__main__":
     for idx, val in enumerate(src_files):
         src_file = src_files[idx]
         dst_file = dst_files[idx]
-        sushi = 'python2 ' + MY_SUSHI_PATH + ' --no-grouping --window ' + args.win
+        sushi = 'sushi --no-grouping --window ' + args.win
         if args.no_cleanup is True:
             sushi += ' --no-cleanup '
         sushi += ' --src "' + src_file + '"'
