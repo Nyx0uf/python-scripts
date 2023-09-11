@@ -15,6 +15,7 @@ from shlex import quote
 from typing import List
 from utils import av, common
 
+
 def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str, delete: bool):
     """Merge `subs` into `vids` and output a .mkv file, assuming `subs` and `vids` are the exact same length"""
     flag_forced = "forced" in name.lower()
@@ -28,6 +29,7 @@ def merge_subs(subs: List[Path], vids: List[Path], lang: str, name: str, delete:
             sub.unlink()
             vid.unlink()
             outfile.rename(vid)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

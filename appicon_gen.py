@@ -69,6 +69,6 @@ if __name__ == "__main__":
         common.abort(parser.format_help())
 
     for size in PIXEL_SIZES:
-        #convert "$1" -quality 100 "${f2}.jpg"
+        # convert "$1" -quality 100 "${f2}.jpg"
         cmd = f"convert -quality 100 {quote(str(args.input))} -resize {size} {size}.png"
         os.system(cmd)

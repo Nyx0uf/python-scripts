@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # Find best quality audio track
     for lang in audio_langs:
         tracks_per_lang: List[mkvfile.MkvTrack] = list(filter(lambda x: x.lang == lang and x.type == "audio", commands.keys()))
-        #print("{} --> {}".format(lang, tracks_per_lang))
+        # print("{} --> {}".format(lang, tracks_per_lang))
         if len(tracks_per_lang) > 1:
             bestTrack: mkvfile.MkvTrack = None
             for track in tracks_per_lang:
@@ -99,7 +99,7 @@ if __name__ == "__main__":
                     bestTrack = track
                 else:
                     del commands[track]
-            #print("[+] Best track is {}".format(bestTrack))
+            # print("[+] Best track is {}".format(bestTrack))
 
     mkvextract = f"mkvextract tracks {quote(str(mkv.path))} "
     for track, arg in commands.items():

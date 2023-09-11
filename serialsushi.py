@@ -9,6 +9,7 @@ import os
 import argparse
 import sys
 
+
 def list_directory(p_path, p_sorted=False):
     """Returns the list of files at p_path"""
     ret = list()
@@ -21,6 +22,7 @@ def list_directory(p_path, p_sorted=False):
             p = os.path.join(p_path, f)
             ret.append(p)
     return ret if p_sorted is False else sorted(ret)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

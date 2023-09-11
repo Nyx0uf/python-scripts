@@ -13,17 +13,19 @@ from shlex import quote
 from utils import common
 from utils import mkvfile
 
-def fix_attachment(mkv: Path, attachment: mkvfile.MkvAttachment):
+
+def fix_attachment(p_mkv: Path, p_attachment: mkvfile.MkvAttachment):
     """Fix mime types"""
     mime = None
-    if "ttf" in attachment.file_name.lower():
+    if "ttf" in p_attachment.file_name.lower():
         mime = 'application/x-truetype-font'
-    elif "otf" in attachment.file_name.lower():
+    elif "otf" in p_attachment.file_name.lower():
         mime = 'application/vnd.ms-opentype'
 
     if mime is not None:
-        cmd = f'mkvpropedit {quote(str(mkv))} --attachment-mime-type {mime} --update-attachment {attachment.id}'
+        cmd = f'mkvpropedit {quote(str(p_mkv))} --attachment-mime-type {mime} --update-attachment {p_attachment.id}'
         os.system(cmd)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
