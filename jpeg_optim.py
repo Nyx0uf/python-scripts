@@ -39,12 +39,12 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
     return None
 
 
-def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
+def th_optimize(p_queue: Queue, all_programs: List[str], keep_metadata: bool):
     """Optimization thread"""
     while p_queue.empty() is False:
         original_file: Path = p_queue.get()
         last_processed_file = original_file
-        for prg in programs:
+        for prg in all_programs:
             if prg == O_SUBSAMPLE and is_420_subsampled(original_file) is True:
                 # Already subsampled, skip to next filter
                 LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_YELLOW}{original_file}{common.COLOR_WHITE} is already subsampled, skipping…")

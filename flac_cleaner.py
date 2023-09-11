@@ -84,10 +84,10 @@ if __name__ == "__main__":
     LOGGER.log(f"{common.COLOR_WHITE}[+] {len(files)} file{'s' if len(files) != 1 else ''} to consider")
 
     if args.list_tags is True:
-        all_tags = []
-        common.parallel(list_tags, (queue, all_tags,))
-        print(f"----\n{sorted(set(all_tags))}\n----")
+        tags = []
+        common.parallel(list_tags, (queue, tags,))
+        print(f"----\n{sorted(set(tags))}\n----")
     else:
         # Clean
-        metaflac = remove_tags_cmd()
-        common.parallel(clean_flac, (queue, metaflac, args.only_blocks,))
+        metaflac_cmd = remove_tags_cmd()
+        common.parallel(clean_flac, (queue, metaflac_cmd, args.only_blocks,))

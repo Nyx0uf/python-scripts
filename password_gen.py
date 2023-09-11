@@ -16,12 +16,12 @@ MAX_PASSWORD_LENGTH = int(128)
 DEFAULT_PASSWORD_LENGTH = int(16)
 
 
-def generate_password(charset: List[str], length: int) -> str:
+def generate_password(p_charset: List[str], p_length: int) -> str:
     """Generate the password from the charset"""
-    randomized = list(charset)
+    randomized = list(p_charset)
     random.shuffle(randomized)
-    password = random.choices(randomized, k=length)
-    return "".join(password)
+    generated_password = random.choices(randomized, k=p_length)
+    return "".join(generated_password)
 
 
 if __name__ == "__main__":
