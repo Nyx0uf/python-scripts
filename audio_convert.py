@@ -81,7 +81,7 @@ def convert(p_queue: Queue, fmt: str, sr: str, bd: str, ext: str, delete: bool):
     elif fmt == 'flac':
         ffmpeg_options += 'flac -compression_level 12'
     elif fmt == 'aac':
-        #enc = 'aac_at' if sys.platform.lower() == "darwin" else 'libfdk_aac'
+        # enc = 'aac_at' if sys.platform.lower() == "darwin" else 'libfdk_aac'
         enc = 'libfdk_aac'
         ffmpeg_options += f'{enc} -vbr 5 -movflags +faststart'
     elif fmt == 'mp3':

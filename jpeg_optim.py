@@ -21,10 +21,12 @@ O_SUBSAMPLE = str("subsample")
 O_JPEGTRAN = str("jpegtran")
 O_GUETZLI = str("guetzli")
 
+
 def is_420_subsampled(path: Path) -> bool:
     """Check if the jpeg file at `path` is 420"""
     ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip()
     return '2x2,1x1,1x1' in ch
+
 
 def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata: bool) -> str:
     """returns the command corresponding to `program`"""
@@ -35,6 +37,7 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
     if program == O_JPEGTRAN:
         return f"jpegtran -optimize -copy {'all' if keep_metadata is True else 'none'} -progressive -outfile {quote(str(outfile))} {quote(str(infile))}"
     return None
+
 
 def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
     """Optimization thread"""
@@ -75,6 +78,7 @@ def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
             original_file.unlink()
             last_processed_file.rename(original_file)
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

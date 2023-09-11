@@ -14,6 +14,7 @@ from shlex import quote
 from typing import List
 from utils import common
 
+
 def merge_chapters(chaps: List[Path], vids: List[Path], delete: bool):
     """Merge `chaps` into `vids`"""
     for idx, _ in enumerate(chaps):
@@ -23,6 +24,7 @@ def merge_chapters(chaps: List[Path], vids: List[Path], delete: bool):
         os.system(mkvmerge)
         if delete is True:
             chap.unlink()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List
 from utils import common
 
+
 def make_chapters_metadata(files: List[Path], input_dir: Path):
     """Create chapters file in ffmpeg metadata format"""
     chapters = {}
@@ -16,9 +17,9 @@ def make_chapters_metadata(files: List[Path], input_dir: Path):
     for vid_file in files:
         command = f"ffprobe -v quiet -of csv=p=0 -show_entries format=duration {quote(str(vid_file))}"
         duration_in_microseconds = int((subprocess.run(command, shell=True, capture_output=True, check=False).stdout.decode().strip().replace(".", "")))
-        if chap_number >= 100 and chap_number < 1000:
+        if 100 <= chap_number < 1000:
             number = f"0{chap_number}"
-        elif chap_number >= 10 and chap_number < 100:
+        elif 10 <= chap_number < 100:
             number = f"00{chap_number}"
         else:
             number = f"000{chap_number}"
@@ -46,6 +47,7 @@ END={}
 title={}
 """.format(chapters[chapter]["start"], chapters[chapter]["end"], chapter)
             m.writelines(ch_meta)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

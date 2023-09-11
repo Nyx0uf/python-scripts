@@ -30,18 +30,18 @@ if __name__ == "__main__":
 
     # Initialize state
     status: Dict[str, int] = {}
-    for l in lights:
-        status[l.name] = 0
+    for lit in lights:
+        status[lit.name] = 0
 
     while True:
         for light in lights:
             if light.on is True:
-                #print(f"{light.name} is on")
+                # print(f"{light.name} is on")
                 status[light.name] += TIME_TO_SLEEP
             else:
                 status[light.name] = 0
             # If lamp still on after `TIME_TO_KILL`, change state
             if status[light.name] >= TIME_TO_KILL:
-                #print(f"{light.name} has been on for {status[light.name]}s, shutting down.")
+                # print(f"{light.name} has been on for {status[light.name]}s, shutting down.")
                 light.on = False
         time.sleep(TIME_TO_SLEEP)

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import List
 from utils import common
 
+
 def map_names(src: List[Path], dst: List[Path], real=False):
     """rename `dst` to match `src`"""
     for idx, val in enumerate(src):
@@ -21,6 +22,7 @@ def map_names(src: List[Path], dst: List[Path], real=False):
         print(f"{common.COLOR_WHITE}{target_file}\n ↳ {common.COLOR_YELLOW}{new_file}{common.COLOR_WHITE}")
         if real is True:
             shutil.move(target_file, new_file)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

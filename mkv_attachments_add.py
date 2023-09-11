@@ -12,6 +12,7 @@ from pathlib import Path
 from shlex import quote
 from utils import common
 
+
 def add_attachment(mkv: Path, attachment: Path):
     """Add `attachment` to `mkv`"""
     mime = None
@@ -28,6 +29,7 @@ def add_attachment(mkv: Path, attachment: Path):
     else:
         cmd = f'mkvpropedit {quote(str(mkv))} --add-attachment {quote(str(attachment))}'
     os.system(cmd)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
