@@ -131,27 +131,27 @@ def load_cfg(path: Path):
         raise IOError(f"[!] {path} not found")
 
 
-def th(lamp: HueLampConfig):
+def th(p_lamp: HueLampConfig):
     """Thread"""
     print(f"[+] Starting {threading.current_thread().name}")
     while True:
         now = datetime.datetime.now()
         hour = int(now.hour)
 
-        if hour in lamp.hours:
-            lamp.managed = True
-            lamp.light.on = True
+        if hour in p_lamp.hours:
+            p_lamp.managed = True
+            p_lamp.light.on = True
             rgb = random_rgb()
-            bright = random.randint(lamp.brightness_min, lamp.brightness_max)
-            lamp.light.xy = rgb_to_xy(rgb[0], rgb[1], rgb[2])
-            lamp.light.brightness = bright
-            print(f"[{threading.get_ident()}] Setting {lamp.name} to color {rgb}[{bright}]")
+            bright = random.randint(p_lamp.brightness_min, p_lamp.brightness_max)
+            p_lamp.light.xy = rgb_to_xy(rgb[0], rgb[1], rgb[2])
+            p_lamp.light.brightness = bright
+            print(f"[{threading.get_ident()}] Setting {p_lamp.name} to color {rgb}[{bright}]")
         else:
-            if lamp.managed is True:
-                if lamp.light.on is True:
-                    lamp.light.on = False
-                lamp.managed = False
-        time.sleep(lamp.interval)
+            if p_lamp.managed is True:
+                if p_lamp.light.on is True:
+                    p_lamp.light.on = False
+                p_lamp.managed = False
+        time.sleep(p_lamp.interval)
 
 
 if __name__ == "__main__":

@@ -16,9 +16,9 @@ from utils import common
 from utils import mkvfile
 
 
-def extract_attachment(path: Path, attachment: mkvfile.MkvAttachment):
+def extract_attachment(path: Path, p_attachment: mkvfile.MkvAttachment):
     """Extractor function"""
-    cmd = f"mkvextract attachments {quote(str(path))} {attachment.id}:{quote(attachment.file_name.lower())}"
+    cmd = f"mkvextract attachments {quote(str(path))} {p_attachment.id}:{quote(p_attachment.file_name.lower())}"
     os.system(cmd)
 
 

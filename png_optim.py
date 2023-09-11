@@ -31,12 +31,12 @@ def command_for_filter(program: str, infile: Path, outfile: Path) -> str:
     return None
 
 
-def th_optimize(p_queue: Queue, programs: List[str]):
+def th_optimize(p_queue: Queue, all_programs: List[str]):
     """Optimization thread"""
     while p_queue.empty() is False:
         infile: Path = p_queue.get()
         last_file = infile
-        for prg in programs:
+        for prg in all_programs:
             outfile = infile.with_name(f"{infile.stem}.{prg}.png")
             cmd = command_for_filter(prg, last_file, outfile)
             if cmd is None:

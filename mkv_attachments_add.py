@@ -13,10 +13,10 @@ from shlex import quote
 from utils import common
 
 
-def add_attachment(mkv: Path, attachment: Path):
+def add_attachment(mkv: Path, p_attachment: Path):
     """Add `attachment` to `mkv`"""
     mime = None
-    la = attachment.name.lower()
+    la = p_attachment.name.lower()
     if "ttf" in la:
         mime = 'application/x-truetype-font'
     elif "otf" in la:
@@ -25,9 +25,9 @@ def add_attachment(mkv: Path, attachment: Path):
         mime = 'image/jpeg'
 
     if mime is not None:
-        cmd = f'mkvpropedit {quote(str(mkv))} --attachment-mime-type {mime} --add-attachment {quote(str(attachment))}'
+        cmd = f'mkvpropedit {quote(str(mkv))} --attachment-mime-type {mime} --add-attachment {quote(str(p_attachment))}'
     else:
-        cmd = f'mkvpropedit {quote(str(mkv))} --add-attachment {quote(str(attachment))}'
+        cmd = f'mkvpropedit {quote(str(mkv))} --add-attachment {quote(str(p_attachment))}'
     os.system(cmd)
 
 

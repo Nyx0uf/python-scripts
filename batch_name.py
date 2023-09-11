@@ -23,14 +23,14 @@ def rename(src: List[Path], pattern: str, zero: str, after: str, real=False):
         filename = os.path.basename(filepath)
         target_filename = ""
         if zero is True:
-            if count >= 100 and count < 1000:
+            if 100 <= count < 1000:
                 if good_index >= 100:
                     target_filename = f"{pattern}{good_index}"
-                elif good_index < 100 and good_index >= 10:
+                elif 100 > good_index >= 10:
                     target_filename = f"{pattern}0{good_index}"
                 else:
                     target_filename = f"{pattern}00{good_index}"
-            elif count >= 10 and count < 100:
+            elif 10 <= count < 100:
                 if good_index < 10:
                     target_filename = f"{pattern}0{good_index}"
                 elif good_index >= 10:
