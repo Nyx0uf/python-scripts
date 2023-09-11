@@ -6,6 +6,8 @@
       <w>bunkus</w>
       <w>caffile</w>
       <w>faststart</w>
+      <w>ffmetadata</w>
+      <w>ffprobe</w>
       <w>gitconfig</w>
       <w>guirc</w>
       <w>hrtf</w>
@@ -18,6 +20,7 @@
       <w>loglevel</w>
       <w>lundi</w>
       <w>makemkvrc</w>
+      <w>metadatafile</w>
       <w>mkvtoolnix</w>
       <w>movflags</w>
       <w>nanorc</w>
