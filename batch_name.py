@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import List
 from utils import common
 
+
 def rename(src: List[Path], pattern: str, zero: str, after: str, real=False):
     """Rename `src` following `pattern`"""
     count = len(src)
@@ -44,6 +45,7 @@ def rename(src: List[Path], pattern: str, zero: str, after: str, real=False):
         if real is True:
             shutil.move(val, new_file)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
@@ -59,7 +61,9 @@ if __name__ == "__main__":
     # If path is a directory, get a list of files
     src_files = common.list_directory(args.input.resolve(), None, True)
 
-    rename(src_files, args.before_pattern if args.before_pattern is not None else "", args.zero, args.after_pattern, False)
+    rename(src_files, args.before_pattern if args.before_pattern is not None else "", args.zero, args.after_pattern,
+           False)
     ok = input("Proceed (y/n) ? ")
     if common.str2bool(ok) is True:
-        rename(src_files, args.before_pattern if args.before_pattern is not None else "", args.zero, args.after_pattern, True)
+        rename(src_files, args.before_pattern if args.before_pattern is not None else "", args.zero, args.after_pattern,
+               True)
