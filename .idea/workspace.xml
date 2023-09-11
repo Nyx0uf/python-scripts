@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4caaff5b-e9e5-4dd9-83f3-3f86192e0da6" name="Changes" comment="PEP8 shadow names">
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/benjamin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/benjamin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/merge_to_single_mkv.py" beforeDir="false" afterPath="$PROJECT_DIR$/merge_to_single_mkv.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2VFMxb8v99lXIBqU2wTNengT5Gb" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "editor.preferences.appearance"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task id="LOCAL-00001" summary="PEP8 spacing">
+      <option name="closed" value="true" />
+      <created>1694425627029</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1694425627029</updated>
+    </task>
+    <task id="LOCAL-00002" summary="PEP8 shadow names">
+      <option name="closed" value="true" />
+      <created>1694426914889</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1694426914889</updated>
+    </task>
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4caaff5b-e9e5-4dd9-83f3-3f86192e0da6" name="Changes" comment="PEP8 shadow names" />
+      <created>1694427622904</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1694427622904</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="clean" />
+    <MESSAGE value="PEP8 spacing" />
+    <MESSAGE value="PEP8 shadow names" />
+    <option name="LAST_COMMIT_MESSAGE" value="PEP8 shadow names" />
+  </component>
+</project>

@@ -14,7 +14,7 @@ import csv
 from pathlib import Path
 from threading import Thread, Lock
 from typing import Dict, List
-import extract_msg # pip install extract_msg
+import extract_msg  # pip install extract_msg
 from utils import common
 
 DAY_HOUR_MAP: Dict[str, str] = {
@@ -25,22 +25,26 @@ DAY_HOUR_MAP: Dict[str, str] = {
 
 LOCK = Lock()
 
+
 def day_from_date(date: str) -> str:
     """Get 3 letters day from a date with format %a, %d %b %Y %H:%M:%S %z"""
     return date.split(',')[0].lower()
+
 
 def is_interesting_day(day: str) -> bool:
     """lundi, mercredi, vendredi uniquement"""
     return day.lower() in ["mon", "wed", "fri"]
 
-def contains_terms(message: str, terms: List[str]) -> bool:
+
+def contains_terms(message: str, all_terms: List[str]) -> bool:
     """Search for `terms` in `message`"""
-    for term in terms:
+    for term in all_terms:
         if term in message:
             return True
     return False
 
-def th_filter(p_queue: queue.Queue, results: List[Dict[str, str]], errors: List[str], ignored_days: List[str], ignored_hours: List[str], terms: List[str]):
+
+def th_filter(p_queue: queue.Queue, p_results: List[Dict[str, str]], p_errors: List[str], p_ignored_days: List[str], p_ignored_hours: List[str], p_terms: List[str]):
     """Filter thread"""
     while p_queue.empty() is False:
         infile = p_queue.get()
@@ -53,26 +57,25 @@ def th_filter(p_queue: queue.Queue, results: List[Dict[str, str]], errors: List[
                 max_hour = DAY_HOUR_MAP[day]
                 mail_date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %z')
                 if int(mail_date.hour) >= int(max_hour) and int(mail_date.minute) > 1:
-                    if terms:
-                        if contains_terms(msg.body.lower(), terms) is True:
-                            ddd = {}
-                            ddd[filename] = date
+                    if p_terms:
+                        if contains_terms(msg.body.lower(), p_terms) is True:
+                            ddd = {filename: date}
                             LOCK.acquire()
-                            results.append(ddd)
+                            p_results.append(ddd)
                             LOCK.release()
                     else:
-                        ddd = {}
-                        ddd[filename] = date
+                        ddd = {filename: date}
                         LOCK.acquire()
-                        results.append(ddd)
+                        p_results.append(ddd)
                         LOCK.release()
                 else:
-                    ignored_hours.append(filename)
+                    p_ignored_hours.append(filename)
             else:
-                ignored_days.append(filename)
+                p_ignored_days.append(filename)
         except (IOError, TypeError):
-            errors.append(filename)
+            p_errors.append(filename)
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -21,10 +21,12 @@ O_SUBSAMPLE = str("subsample")
 O_JPEGTRAN = str("jpegtran")
 O_GUETZLI = str("guetzli")
 
+
 def is_420_subsampled(path: Path) -> bool:
     """Check if the jpeg file at `path` is 420"""
     ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip()
     return '2x2,1x1,1x1' in ch
+
 
 def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata: bool) -> str:
     """returns the command corresponding to `program`"""
@@ -36,12 +38,13 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
         return f"jpegtran -optimize -copy {'all' if keep_metadata is True else 'none'} -progressive -outfile {quote(str(outfile))} {quote(str(infile))}"
     return None
 
-def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
+
+def th_optimize(p_queue: Queue, all_programs: List[str], keep_metadata: bool):
     """Optimization thread"""
     while p_queue.empty() is False:
         original_file: Path = p_queue.get()
         last_processed_file = original_file
-        for prg in programs:
+        for prg in all_programs:
             if prg == O_SUBSAMPLE and is_420_subsampled(original_file) is True:
                 # Already subsampled, skip to next filter
                 LOGGER.log(f"{common.COLOR_WHITE}(th_{threading.current_thread().name})[-] {common.COLOR_YELLOW}{original_file}{common.COLOR_WHITE} is already subsampled, skipping…")
@@ -75,6 +78,7 @@ def th_optimize(p_queue: Queue, programs: List[str], keep_metadata: bool):
             original_file.unlink()
             last_processed_file.rename(original_file)
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

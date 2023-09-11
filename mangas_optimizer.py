@@ -18,7 +18,7 @@ from queue import Queue
 from shlex import quote
 
 import numpy
-from PIL import Image # pip3 install Pillow
+from PIL import Image  # pip3 install Pillow
 import pyopencl as cl
 
 from utils import common
@@ -36,6 +36,7 @@ __kernel void isGrey(read_only image2d_t src, __global unsigned int* color)
 }
 """
 
+
 def cl_is_grey(p_rgb, p_cl_context: cl.Context, p_cl_queue: cl.CommandQueue, p_cl_program: cl.Program) -> bool:
     """Check if an image is grey using OpenCL"""
     pixels = numpy.array(p_rgb)
@@ -50,6 +51,7 @@ def cl_is_grey(p_rgb, p_cl_context: cl.Context, p_cl_queue: cl.CommandQueue, p_c
     cl.enqueue_copy(p_cl_queue, nb_colors, dev_color)
     return bool(nb_colors == 0)
 
+
 def save_to_format(p_queue: Queue, fmt: str):
     """PNG export thread"""
     while p_queue.empty() is False:
@@ -59,6 +61,7 @@ def save_to_format(p_queue: Queue, fmt: str):
         img2.save(png_path, quality=100, optimize=False, progressive=False, icc_profile=None)
         original_file.unlink()
         p_queue.task_done()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
