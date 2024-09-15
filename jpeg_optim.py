@@ -31,7 +31,7 @@ def is_420_subsampled(path: Path) -> bool:
 def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata: bool) -> str:
     """returns the command corresponding to `program`"""
     if program == O_SUBSAMPLE:
-        return f"convert {quote(str(infile))} -sampling-factor '2x2,1x1,1x1' {quote(str(outfile))}"
+        return f"magick {quote(str(infile))} -sampling-factor '2x2,1x1,1x1' {quote(str(outfile))}"
     if program == O_GUETZLI:
         return f"guetzli --quality 84 --nomemlimit {'--keep-exif' if keep_metadata is True else ''} {quote(str(infile))} {quote(str(outfile))}"
     if program == O_JPEGTRAN:
