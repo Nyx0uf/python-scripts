@@ -77,12 +77,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
     parser.add_argument("-m", "--merge", dest="merge", action="store_true", help="Merge all videos file into a single chaptered one")
-    parser.add_argument("-format", action="store", dest="format", type=str, default="mkv", help="Output file format (between mkv, mp4)")
+    parser.add_argument("-f", "--format", dest="format", action="store", type=str, default="mkv", help="Output file format (mkv or mp4)")
     args = parser.parse_args()
 
     # Sanity checks
-    common.ensure_exist(["ffmpeg"])
+    common.ensure_exist(["ffmpeg", "ffprobe", "mkvpropedit"])
     if args.input.exists() is False:
+        common.abort(parser.format_help())
+
+    output_format = args.format.lower()
+    if output_format not in ["mp4", "mkv"]:
         common.abort(parser.format_help())
 
     os.chdir(args.input)
@@ -98,13 +102,13 @@ if __name__ == '__main__':
         with open(vlname, mode="a", encoding="utf-8") as f:
             f.write(f"file '{filename}'\n")
 
-    if args.format == "mkv":
+    if output_format == "mkv":
         create_mkv_chapters_file(video_files)
     else:
         create_ffmpeg_chapters_file(video_files)
 
     if args.merge is True:
-        if args.format == "mkv":
+        if output_format == "mkv":
             ffmpeg_cmd = f"ffmpeg -y -f concat -i {quote(str(vlname))} -c copy merged.mkv"
             os.system(ffmpeg_cmd)
             os.system(f"mkvpropedit --chapters {quote(G_MKV_META_FILE)} merged.mkv")
