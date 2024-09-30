@@ -76,7 +76,7 @@ def create_mkv_chapters_file(files: List[Path]):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path, help="Path to directory")
-    parser.add_argument("-m", "--merge", dest="merge", action="store_true", help="Merge all videos file into a single chaptered one")
+    parser.add_argument("-m", "--merge", dest="merge", action="store_true", help="Merge all videos files into a single chaptered one")
     parser.add_argument("-f", "--format", dest="format", action="store", type=str, default="mkv", help="Output file format (mkv or mp4)")
     args = parser.parse_args()
 
