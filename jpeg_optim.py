@@ -93,7 +93,7 @@ if __name__ == "__main__":
     LOGGER = logger.Logger(args.verbose)
 
     programs: List[str] = []
-    if args.subsample is True and common.which("identify") is not None and common.which("convert") is not None:
+    if args.subsample is True and common.which("identify") is not None and common.which("magick") is not None:
         programs.append(O_SUBSAMPLE)
     if args.use_guetzli is True and common.which("guetzli") is not None:
         programs.append(O_GUETZLI)
