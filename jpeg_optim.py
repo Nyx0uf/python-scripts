@@ -24,7 +24,7 @@ O_GUETZLI = str("guetzli")
 
 def is_420_subsampled(path: Path) -> bool:
     """Check if the jpeg file at `path` is 420"""
-    ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip()
+    ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip().lower()
     return '2x2,1x1,1x1' in ch
 
 
