@@ -109,9 +109,9 @@ if __name__ == '__main__':
 
     if args.merge is True:
         if output_format == "mkv":
-            ffmpeg_cmd = f"ffmpeg -y -f concat -i {quote(str(vlname))} -c copy merged.mkv"
+            ffmpeg_cmd = f"ffmpeg -y -f concat -safe 0 -i {quote(str(vlname))} -c copy merged.mkv"
             os.system(ffmpeg_cmd)
             os.system(f"mkvpropedit --chapters {quote(G_MKV_META_FILE)} merged.mkv")
         else:
-            ffmpeg_cmd = f"ffmpeg -y -f concat -i {quote(str(vlname))} -i {quote(G_FFM_META_FILE)} -map_metadata 1 -c copy merged.mp4"
+            ffmpeg_cmd = f"ffmpeg -y -f concat -safe 0 -i {quote(str(vlname))} -i {quote(G_FFM_META_FILE)} -map_metadata 1 -c copy merged.mp4"
             os.system(ffmpeg_cmd)
