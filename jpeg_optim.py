@@ -24,7 +24,7 @@ O_GUETZLI = str("guetzli")
 
 def is_420_subsampled(path: Path) -> bool:
     """Check if the jpeg file at `path` is 420"""
-    ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip()
+    ch = common.system_call(f"identify -format %[jpeg:sampling-factor] {quote(str(path))}").decode("utf-8").strip().lower()
     return '2x2,1x1,1x1' in ch
 
 
@@ -33,7 +33,7 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
     if program == O_SUBSAMPLE:
         return f"magick {quote(str(infile))} -sampling-factor '2x2,1x1,1x1' {quote(str(outfile))}"
     if program == O_GUETZLI:
-        return f"guetzli --quality 84 --nomemlimit {'--keep-exif' if keep_metadata is True else ''} {quote(str(infile))} {quote(str(outfile))}"
+        return f"guetzli --quality 84 --nomemlimit{' --keep-exif' if keep_metadata is True else ''} {quote(str(infile))} {quote(str(outfile))}"
     if program == O_JPEGTRAN:
         return f"jpegtran -optimize -copy {'all' if keep_metadata is True else 'none'} -progressive -outfile {quote(str(outfile))} {quote(str(infile))}"
     return None
