@@ -33,7 +33,7 @@ def command_for_filter(program: str, infile: Path, outfile: Path, keep_metadata:
     if program == O_SUBSAMPLE:
         return f"magick {quote(str(infile))} -sampling-factor '2x2,1x1,1x1' {quote(str(outfile))}"
     if program == O_GUETZLI:
-        return f"guetzli --quality 84 --nomemlimit{' --keep-exif' if keep_metadata is True else ''} {quote(str(infile))} {quote(str(outfile))}"
+        return f"guetzli --nomemlimit --quality 84{' --keep-exif' if keep_metadata is True else ''} {quote(str(infile))} {quote(str(outfile))}"
     if program == O_JPEGTRAN:
         return f"jpegtran -optimize -copy {'all' if keep_metadata is True else 'none'} -progressive -outfile {quote(str(outfile))} {quote(str(infile))}"
     return None
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode")
     parser.add_argument("-s", "--subsample", dest="subsample", action='store_true', help="Subsample image to 420 if needed, default: false")
     parser.add_argument("-g", "--guetzli", dest="use_guetzli", action='store_true', help="Use guetzli (very slow and huge memory consumption), default: false")
-    parser.add_argument("-j", "--jpegtran", dest="use_jpegtran", action="store_true", default=True, help="Use jpegtran, default: true")
+    parser.add_argument("-j", "--jpegtran", dest="use_jpegtran", action="store_true", help="Use jpegtran, default: false")
     parser.add_argument("-m", "--keep-metadata", dest="keep_metadata", action='store_true', help="Keep metadata, default: false")
     parser.add_argument("-t", "--threads", dest="threads", type=int, default=0, help="Number of files to process simultaneously")
     args = parser.parse_args()
