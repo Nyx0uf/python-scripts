@@ -71,6 +71,11 @@ def tar_xz(src: Path, dst: Path):
     os.system(f"XZ_OPT=-9 tar -Jcf {str(dst)} {str(src)}")
 
 
+def tar_gz(src: Path, dst: Path):
+    """tar cf - INPUT | gzip --best > OUTPUT.tar.gz"""
+    os.system(f"GZ_OPT=-9 tar -czf {str(dst)} {str(src)}")
+
+
 def match_signature(path: Path, signatures: List[bytes]) -> bool:
     """Check if `path` match a signature"""
     def all_items_equal(lst: List) -> bool:
